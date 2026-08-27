@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check - Inventario</title>
+  <link rel="icon" type="image/png" href="https://i.imgur.com/qdIS9iU.png">
+  <link rel="apple-touch-icon" href="https://i.imgur.com/qdIS9iU.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="brand">
+      <img id="app-logo" src="https://i.imgur.com/qdIS9iU.png" alt="Check Logo">
+      <span>Check</span>
+    </div>
+    <button id="btn-theme-toggle" class="icon-btn" title="Cambiar Tema">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"></circle>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+      </svg>
+    </button>
+  </header>
+
+  <!-- NAVEGACIÓN PRINCIPAL (TABS) -->
+  <nav class="tab-bar">
+    <button id="tab-btn-warehouses" class="tab-btn active">Almacenes</button>
+    <button id="tab-btn-stores" class="tab-btn">Tiendas</button>
+    <button id="tab-btn-metrics" class="tab-btn">Utilidades</button>
+  </nav>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="main-container">
+
+    <!-- VISTA: ALMACENES -->
+    <section id="view-warehouses" class="view-section">
+      <div class="section-header">
+        <h2>Mis Almacenes</h2>
+        <button id="btn-open-create-warehouse" class="btn-primary">+ Almacén</button>
+      </div>
+      <div id="warehouses-grid" class="cards-grid"></div>
+    </section>
+
+    <!-- VISTA: DETALLE DE UN ALMACÉN (CATEGORÍAS Y PRODUCTOS) -->
+    <section id="view-warehouse-detail" class="view-section hidden">
+      <button id="btn-back-to-warehouses" class="btn-secondary">← Volver a almacenes</button>
+      <div class="section-header" style="margin-top: 15px;">
+        <h2 id="detail-warehouse-title">Almacén</h2>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-open-create-category" class="btn-secondary">+ Categoría</button>
+          <button id="btn-open-create-product" class="btn-primary">+ Producto</button>
+        </div>
+      </div>
+      <div id="categories-products-container"></div>
+    </section>
+
+    <!-- VISTA: TIENDAS -->
+    <section id="view-stores" class="view-section hidden">
+      <div class="section-header">
+        <h2>Mis Tiendas</h2>
+        <button id="btn-open-create-store" class="btn-primary">+ Tienda</button>
+      </div>
+      <div id="stores-grid" class="cards-grid"></div>
+    </section>
+
+    <!-- VISTA: DETALLE DE TIENDA -->
+    <section id="view-store-detail" class="view-section hidden">
+      <button id="btn-back-to-stores" class="btn-secondary">← Volver a tiendas</button>
+      <div class="section-header" style="margin-top: 15px;">
+        <h2 id="detail-store-title">Tienda</h2>
+      </div>
+      <div id="store-products-container" class="cards-grid"></div>
+    </section>
+
+    <!-- VISTA: UTILIDADES Y VENTAS -->
+    <section id="view-metrics" class="view-section hidden">
+      <h2>Reporte de Ventas y Utilidades</h2>
+      <div class="metrics-cards">
+        <div class="metric-card">
+          <span>Venta Total</span>
+          <h3 id="metric-total-sales">$0.00</h3>
+        </div>
+        <div class="metric-card highlight">
+          <span>Utilidad Real</span>
+          <h3 id="metric-total-profit">$0.00</h3>
+        </div>
+      </div>
+      <h3>Historial de Ventas</h3>
+      <div id="sales-history-list"></div>
+    </section>
+  </main>
+
+  <!-- MODAL: CREAR ALMACÉN -->
+  <div id="modal-warehouse" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal-warehouse">&times;</span>
+      <h3>Crear Almacén</h3>
+      <form id="form-warehouse">
+        <input type="text" id="warehouse-name" placeholder="Nombre del Almacén" required>
+        <button type="submit" class="btn-primary full-width">Guardar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR CATEGORÍA -->
+  <div id="modal-category" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal-category">&times;</span>
+      <h3>Crear Categoría</h3>
+      <form id="form-category">
+        <input type="text" id="category-name" placeholder="Nombre de Categoría" required>
+        <button type="submit" class="btn-primary full-width">Guardar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR/EDITAR PRODUCTO -->
+  <div id="modal-product" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal-product">&times;</span>
+      <h3 id="modal-product-title">Agregar Producto</h3>
+      <form id="form-product">
+        <input type="hidden" id="prod-id-edit">
+        <input type="text" id="prod-name" placeholder="Nombre del producto" required>
+        <div class="form-row">
+          <input type="number" step="0.01" id="prod-buy-price" placeholder="Precio Compra ($)" required>
+          <input type="number" step="0.01" id="prod-sell-price" placeholder="Precio Venta ($)" required>
+        </div>
+        <div class="form-row">
+          <input type="number" id="prod-stock" placeholder="Cantidad Inicial" required>
+          <select id="prod-category-select" required></select>
+        </div>
+        <label style="font-size: 0.8rem; opacity: 0.8;">Foto desde Galería:</label>
+        <input type="file" id="prod-image-file" accept="image/*">
+        <button type="submit" class="btn-primary full-width">Guardar Producto</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR TIENDA -->
+  <div id="modal-store" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal-store">&times;</span>
+      <h3>Crear Tienda</h3>
+      <form id="form-store">
+        <input type="text" id="store-name" placeholder="Nombre de la Tienda" required>
+        <label style="font-size: 0.8rem; opacity: 0.8;">Foto desde Galería:</label>
+        <input type="file" id="store-image-file" accept="image/*">
+        <button type="submit" class="btn-primary full-width">Guardar Tienda</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET / MENU INFERIOR DE ACCIONES PARA PRODUCTO -->
+  <div id="bottom-sheet" class="bottom-sheet hidden">
+    <div class="sheet-content">
+      <div id="sheet-prod-info" class="sheet-header"></div>
+      <div class="sheet-actions">
+        
+        <button id="sheet-btn-edit" class="sheet-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          Editar
+        </button>
+
+        <button id="sheet-btn-add-stock" class="sheet-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Añadir Stock
+        </button>
+
+        <button id="sheet-btn-check" class="sheet-btn check-action">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Check (Mandar a Tienda)
+        </button>
+
+      </div>
+      <button id="close-sheet" class="btn-secondary full-width" style="margin-top: 10px;">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL CHECK: ELEGIR TIENDA Y CANTIDAD -->
+  <div id="modal-transfer" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal-transfer">&times;</span>
+      <h3>Mover a Tienda (Check)</h3>
+      <form id="form-transfer">
+        <label style="font-size:0.85rem;">Selecciona la Tienda Destino:</label>
+        <select id="transfer-store-select" required></select>
+        <input type="number" id="transfer-qty" placeholder="Cantidad a enviar" min="1" required style="margin-top: 10px;">
+        <button type="submit" class="btn-primary full-width" style="margin-top: 15px;">Confirmar Envío</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
