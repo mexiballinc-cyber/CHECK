@@ -1,13 +1,20 @@
-// MEMORIA LOCAL DE LA APP
-let state = JSON.parse(localStorage.getItem('check_app_data')) || {
+// MEMORIA LOCAL CON PERSISTENCIA
+let state = {
   warehouses: [],
   stores: [],
   sales: []
 };
 
-let activeWarehouseId = null;
-let activeStoreId = null;
-let activeProductId = null;
+function loadState() {
+  const saved = localStorage.getItem('check_app_data');
+  if (saved) {
+    try {
+      state = JSON.parse(saved);
+    } catch (e) {
+      console.error("Error al cargar localStorage", e);
+    }
+  }
+}
 
 function saveState() {
   localStorage.setItem('check_app_data', JSON.stringify(state));
@@ -16,10 +23,7 @@ function saveState() {
 // CONVERTIR IMÁGENES A BASE64
 function fileToBase64(file) {
   return new Promise((resolve) => {
-    if (!file) {
-      resolve(null);
-      return;
-    }
+    if (!file) resolve(null);
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target.result);
     reader.onerror = () => resolve(null);
@@ -51,16 +55,24 @@ Object.keys(tabs).forEach(key => {
   tabs[key].btn.onclick = () => switchMainTab(key);
 });
 
-// ALMACENES
+let activeWarehouseId = null;
+let activeStoreId = null;
+let activeProductId = null;
+
+// RENDER Y GESTIÓN DE ALMACENES
 function renderWarehouses() {
   const container = document.getElementById('warehouses-grid');
   container.innerHTML = state.warehouses.length === 0
     ? `<p style="grid-column: span 2; opacity:0.6;">No tienes almacenes creados.</p>`
     : state.warehouses.map(w => `
-        <div class="item-card" onclick="openWarehouse('${w.id}')">
-          <div style="font-size:2rem; text-align:center; margin: 10px 0;">📦</div>
+        <div class="item-card glass-card" onclick="openWarehouse('${w.id}')">
+          <div class="card-top-actions">
+            <button class="btn-mini-action" onclick="event.stopPropagation(); editWarehouse('${w.id}')">✏️</button>
+            <button class="btn-mini-action" onclick="event.stopPropagation(); deleteWarehouse('${w.id}')">🗑️</button>
+          </div>
+          <div style="font-size:2.2rem; text-align:center; margin: 12px 0;">📦</div>
           <h4>${w.name}</h4>
-          <span class="subtext">${w.categories ? w.categories.length : 0} Categorías</span>
+          <span class="subtext">${(w.categories || []).length} Categorías</span>
         </div>
       `).join('');
 }
@@ -68,6 +80,7 @@ function renderWarehouses() {
 function openWarehouse(id) {
   activeWarehouseId = id;
   const w = state.warehouses.find(item => item.id === id);
+  if (!w) return;
   if (!w.categories) w.categories = [];
   if (!w.products) w.products = [];
 
@@ -77,19 +90,35 @@ function openWarehouse(id) {
   renderWarehouseProducts();
 }
 
+window.editWarehouse = function(id) {
+  const w = state.warehouses.find(item => item.id === id);
+  document.getElementById('modal-warehouse-title').textContent = "Editar Almacén";
+  document.getElementById('warehouse-id-edit').value = w.id;
+  document.getElementById('warehouse-name').value = w.name;
+  document.getElementById('modal-warehouse').classList.remove('hidden');
+};
+
+window.deleteWarehouse = function(id) {
+  if (confirm("¿Estás seguro de eliminar este almacén y sus contenidos?")) {
+    state.warehouses = state.warehouses.filter(w => w.id !== id);
+    saveState();
+    renderWarehouses();
+  }
+};
+
 document.getElementById('btn-back-to-warehouses').onclick = () => {
   document.getElementById('view-warehouse-detail').classList.add('hidden');
   document.getElementById('view-warehouses').classList.remove('hidden');
   renderWarehouses();
 };
 
-// CATEGORÍAS Y PRODUCTOS DENTRO DEL ALMACÉN
+// CATEGORÍAS Y PRODUCTOS
 function renderWarehouseProducts() {
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   const container = document.getElementById('categories-products-container');
   container.innerHTML = "";
 
-  if (!w.categories || w.categories.length === 0) {
+  if (!w || !w.categories || w.categories.length === 0) {
     container.innerHTML = `<p style="opacity:0.6;">Crea una categoría primero para organizar tus productos.</p>`;
     return;
   }
@@ -101,8 +130,8 @@ function renderWarehouseProducts() {
         <div class="category-header">
           <h3>${cat.name}</h3>
           <div class="category-actions">
-            <button class="btn-icon-action" onclick="editCategory('${cat.id}', '${cat.name}')" title="Editar Categoría">✏️</button>
-            <button class="btn-icon-action" onclick="deleteCategory('${cat.id}')" title="Borrar Categoría">🗑️</button>
+            <button class="btn-icon-action" onclick="editCategory('${cat.id}', '${cat.name}')">✏️</button>
+            <button class="btn-icon-action" onclick="deleteCategory('${cat.id}')">🗑️</button>
           </div>
         </div>
         <div class="cards-grid">
@@ -113,11 +142,11 @@ function renderWarehouseProducts() {
     } else {
       products.forEach(p => {
         catHTML += `
-          <div class="item-card" onclick="openProductSheet('${p.id}')">
+          <div class="item-card glass-card" onclick="openProductSheet('${p.id}')">
             <img src="${p.image || 'https://via.placeholder.com/100?text=Sin+Foto'}">
             <h4>${p.name}</h4>
             <span class="subtext">Stock: ${p.stock}</span>
-            <span class="subtext" style="color:var(--primary); font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
+            <span class="subtext" style="color:#22c55e; font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
           </div>
         `;
       });
@@ -127,7 +156,6 @@ function renderWarehouseProducts() {
   });
 }
 
-// EDITAR Y ELIMINAR CATEGORÍA
 window.editCategory = function(catId, catName) {
   document.getElementById('modal-category-title').textContent = "Editar Categoría";
   document.getElementById('cat-id-edit').value = catId;
@@ -136,7 +164,7 @@ window.editCategory = function(catId, catName) {
 };
 
 window.deleteCategory = function(catId) {
-  if (confirm("¿Estás seguro de eliminar esta categoría? Sus productos no se eliminarán pero quedarán desasignados.")) {
+  if (confirm("¿Estás seguro de eliminar esta categoría?")) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
     w.categories = w.categories.filter(c => c.id !== catId);
     saveState();
@@ -144,23 +172,23 @@ window.deleteCategory = function(catId) {
   }
 };
 
-// BOTTOM SHEET (ACCIONES DE PRODUCTO)
+// BOTTOM SHEET (ACCIONES Y EDICIÓN/BORRADO DE PRODUCTO)
 const sheet = document.getElementById('bottom-sheet');
+
 function openProductSheet(prodId) {
   activeProductId = prodId;
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   const p = w.products.find(item => item.id === prodId);
 
   document.getElementById('sheet-prod-info').innerHTML = `
-    <h4>${p.name}</h4>
-    <p style="font-size:0.85rem; opacity:0.8;">Stock disponible: ${p.stock} pzas</p>
+    <h3 style="margin-bottom:4px;">${p.name}</h3>
+    <p style="font-size:0.85rem; opacity:0.8;">Stock en almacén: <strong>${p.stock} pzas</strong></p>
   `;
   sheet.classList.remove('hidden');
 }
 
 document.getElementById('close-sheet').onclick = () => sheet.classList.add('hidden');
 
-// EDITAR PRODUCTO DESDE BOTTOM SHEET
 document.getElementById('sheet-btn-edit').onclick = () => {
   sheet.classList.add('hidden');
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
@@ -180,8 +208,18 @@ document.getElementById('sheet-btn-edit').onclick = () => {
   document.getElementById('modal-product').classList.remove('hidden');
 };
 
-// AÑADIR STOCK RÁPIDO
+document.getElementById('sheet-btn-delete').onclick = () => {
+  sheet.classList.add('hidden');
+  if (confirm("¿Eliminar este producto permanentemente del almacén?")) {
+    const w = state.warehouses.find(item => item.id === activeWarehouseId);
+    w.products = w.products.filter(p => p.id !== activeProductId);
+    saveState();
+    renderWarehouseProducts();
+  }
+};
+
 document.getElementById('sheet-btn-add-stock').onclick = () => {
+  sheet.classList.add('hidden');
   const addQty = prompt("¿Cuántas piezas deseas añadir al stock?");
   if (addQty && !isNaN(addQty) && parseInt(addQty) > 0) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
@@ -189,18 +227,17 @@ document.getElementById('sheet-btn-add-stock').onclick = () => {
     p.stock += parseInt(addQty);
     saveState();
     renderWarehouseProducts();
-    sheet.classList.add('hidden');
   }
 };
 
-// ACCIÓN CHECK: ENVIAR PRODUCTO A TIENDA
+// CHECK (ENVIAR A TIENDA Y CERRAR MODALES)
 document.getElementById('sheet-btn-check').onclick = () => {
   sheet.classList.add('hidden');
   const storeSelect = document.getElementById('transfer-store-select');
   storeSelect.innerHTML = state.stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
   if (state.stores.length === 0) {
-    alert("Primero debes crear una tienda en la pestaña de 'Tiendas'.");
+    alert("Primero debes crear una tienda.");
     return;
   }
   document.getElementById('modal-transfer').classList.remove('hidden');
@@ -233,8 +270,8 @@ document.getElementById('form-transfer').onsubmit = (e) => {
 
   saveState();
   document.getElementById('modal-transfer').classList.add('hidden');
+  document.getElementById('form-transfer').reset();
   renderWarehouseProducts();
-  alert("¡Producto movido a la tienda con éxito!");
 };
 
 // TIENDAS Y VENTAS
@@ -243,7 +280,11 @@ function renderStores() {
   container.innerHTML = state.stores.length === 0
     ? `<p style="grid-column: span 2; opacity:0.6;">No tienes tiendas creadas.</p>`
     : state.stores.map(s => `
-        <div class="item-card" onclick="openStore('${s.id}')">
+        <div class="item-card glass-card" onclick="openStore('${s.id}')">
+          <div class="card-top-actions">
+            <button class="btn-mini-action" onclick="event.stopPropagation(); editStore('${s.id}')">✏️</button>
+            <button class="btn-mini-action" onclick="event.stopPropagation(); deleteStore('${s.id}')">🗑️</button>
+          </div>
           <img src="${s.image || 'https://via.placeholder.com/100?text=Tienda'}">
           <h4>${s.name}</h4>
           <span class="subtext">${(s.products || []).length} Productos</span>
@@ -254,6 +295,7 @@ function renderStores() {
 function openStore(id) {
   activeStoreId = id;
   const store = state.stores.find(s => s.id === id);
+  if (!store) return;
   if (!store.products) store.products = [];
 
   document.getElementById('detail-store-title').textContent = store.name;
@@ -261,6 +303,22 @@ function openStore(id) {
   document.getElementById('view-store-detail').classList.remove('hidden');
   renderStoreProducts();
 }
+
+window.editStore = function(id) {
+  const s = state.stores.find(item => item.id === id);
+  document.getElementById('modal-store-title').textContent = "Editar Tienda";
+  document.getElementById('store-id-edit').value = s.id;
+  document.getElementById('store-name').value = s.name;
+  document.getElementById('modal-store').classList.remove('hidden');
+};
+
+window.deleteStore = function(id) {
+  if (confirm("¿Estás seguro de eliminar esta tienda?")) {
+    state.stores = state.stores.filter(s => s.id !== id);
+    saveState();
+    renderStores();
+  }
+};
 
 document.getElementById('btn-back-to-stores').onclick = () => {
   document.getElementById('view-store-detail').classList.add('hidden');
@@ -273,18 +331,18 @@ function renderStoreProducts() {
   const container = document.getElementById('store-products-container');
   container.innerHTML = "";
 
-  if (!store.products || store.products.length === 0) {
-    container.innerHTML = `<p style="opacity:0.6; grid-column: span 2;">Sin productos exhibidos.</p>`;
+  if (!store || !store.products || store.products.length === 0) {
+    container.innerHTML = `<p style="opacity:0.6; grid-column: span 2;">Sin productos en exhibición.</p>`;
     return;
   }
 
   store.products.forEach(p => {
     container.innerHTML += `
-      <div class="item-card">
+      <div class="item-card glass-card">
         <img src="${p.image || 'https://via.placeholder.com/100?text=Sin+Foto'}">
         <h4>${p.name}</h4>
-        <span class="subtext">Disponible: ${p.stock}</span>
-        <span class="subtext" style="color:var(--primary); font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
+        <span class="subtext">Disponible: <strong>${p.stock}</strong></span>
+        <span class="subtext" style="color:#22c55e; font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
         <button class="btn-primary" onclick="sellProduct('${p.id}')" style="margin-top:8px; font-size:0.8rem;">
           ✓ Vender 1
         </button>
@@ -313,7 +371,7 @@ window.sellProduct = function(prodId) {
   renderStoreProducts();
 };
 
-// METRICAS Y UTILIDADES
+// MÉTRICAS Y UTILIDADES
 function renderMetrics() {
   let totalSales = 0;
   let totalProfit = 0;
@@ -330,40 +388,48 @@ function renderMetrics() {
   historyList.innerHTML = state.sales.length === 0
     ? `<p style="opacity:0.6; margin-top:10px;">Aún no se registran ventas.</p>`
     : state.sales.slice().reverse().map(s => `
-        <div style="background:var(--card-bg); border:1px solid var(--border-color); padding:10px; border-radius:8px; margin-top:8px; display:flex; justify-content:space-between;">
+        <div style="background:var(--glass-bg); border:1px solid var(--glass-border); padding:12px; border-radius:12px; margin-top:8px; display:flex; justify-content:space-between; backdrop-filter:blur(8px);">
           <div>
             <strong>${s.productName}</strong>
             <div style="font-size:0.75rem; opacity:0.7;">${s.date}</div>
           </div>
           <div style="text-align:right;">
             <div>$${s.sellPrice.toFixed(2)}</div>
-            <div style="color:var(--primary); font-size:0.8rem; font-weight:bold;">+$${s.profit.toFixed(2)}</div>
+            <div style="color:#22c55e; font-size:0.8rem; font-weight:bold;">+$${s.profit.toFixed(2)}</div>
           </div>
         </div>
       `).join('');
 }
 
-// MANEJO DE FORMULARIOS Y MODALES CON CIERRE AUTOMÁTICO
+// SUBMITS DE MODALES
 
-// Crear Almacén
-document.getElementById('btn-open-create-warehouse').onclick = () => document.getElementById('modal-warehouse').classList.remove('hidden');
+// Almacén
+document.getElementById('btn-open-create-warehouse').onclick = () => {
+  document.getElementById('modal-warehouse-title').textContent = "Crear Almacén";
+  document.getElementById('warehouse-id-edit').value = "";
+  document.getElementById('form-warehouse').reset();
+  document.getElementById('modal-warehouse').classList.remove('hidden');
+};
 document.getElementById('close-modal-warehouse').onclick = () => document.getElementById('modal-warehouse').classList.add('hidden');
 
 document.getElementById('form-warehouse').onsubmit = (e) => {
   e.preventDefault();
-  state.warehouses.push({
-    id: Date.now().toString(),
-    name: document.getElementById('warehouse-name').value,
-    categories: [],
-    products: []
-  });
+  const idEdit = document.getElementById('warehouse-id-edit').value;
+  const name = document.getElementById('warehouse-name').value;
+
+  if (idEdit) {
+    const w = state.warehouses.find(item => item.id === idEdit);
+    if (w) w.name = name;
+  } else {
+    state.warehouses.push({ id: Date.now().toString(), name, categories: [], products: [] });
+  }
+
   saveState();
   document.getElementById('modal-warehouse').classList.add('hidden');
-  document.getElementById('form-warehouse').reset();
   renderWarehouses();
 };
 
-// Crear / Editar Categoría
+// Categoría
 document.getElementById('btn-open-create-category').onclick = () => {
   document.getElementById('modal-category-title').textContent = "Crear Categoría";
   document.getElementById('cat-id-edit').value = "";
@@ -387,11 +453,10 @@ document.getElementById('form-category').onsubmit = (e) => {
 
   saveState();
   document.getElementById('modal-category').classList.add('hidden');
-  document.getElementById('form-category').reset();
   renderWarehouseProducts();
 };
 
-// Crear / Editar Producto (CON ASYNC/AWAIT CORREGIDO)
+// Producto
 document.getElementById('btn-open-create-product').onclick = () => {
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   if (!w.categories || w.categories.length === 0) {
@@ -415,7 +480,6 @@ document.getElementById('form-product').onsubmit = async (e) => {
 
   const editId = document.getElementById('prod-id-edit').value;
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
-  if (!w.products) w.products = [];
 
   if (editId) {
     const p = w.products.find(item => item.id === editId);
@@ -439,29 +503,39 @@ document.getElementById('form-product').onsubmit = async (e) => {
 
   saveState();
   document.getElementById('modal-product').classList.add('hidden');
-  document.getElementById('form-product').reset();
   renderWarehouseProducts();
 };
 
-// Crear Tienda
-document.getElementById('btn-open-create-store').onclick = () => document.getElementById('modal-store').classList.remove('hidden');
+// Tienda
+document.getElementById('btn-open-create-store').onclick = () => {
+  document.getElementById('modal-store-title').textContent = "Crear Tienda";
+  document.getElementById('store-id-edit').value = "";
+  document.getElementById('form-store').reset();
+  document.getElementById('modal-store').classList.remove('hidden');
+};
 document.getElementById('close-modal-store').onclick = () => document.getElementById('modal-store').classList.add('hidden');
 
 document.getElementById('form-store').onsubmit = async (e) => {
   e.preventDefault();
   const fileInput = document.getElementById('store-image-file');
   const imageBase64 = await fileToBase64(fileInput.files[0]);
+  const editId = document.getElementById('store-id-edit').value;
 
-  state.stores.push({
-    id: Date.now().toString(),
-    name: document.getElementById('store-name').value,
-    image: imageBase64,
-    products: []
-  });
+  if (editId) {
+    const s = state.stores.find(item => item.id === editId);
+    s.name = document.getElementById('store-name').value;
+    if (imageBase64) s.image = imageBase64;
+  } else {
+    state.stores.push({
+      id: Date.now().toString(),
+      name: document.getElementById('store-name').value,
+      image: imageBase64,
+      products: []
+    });
+  }
 
   saveState();
   document.getElementById('modal-store').classList.add('hidden');
-  document.getElementById('form-store').reset();
   renderStores();
 };
 
@@ -474,5 +548,6 @@ document.getElementById('btn-theme-toggle').onclick = () => {
   document.getElementById('app-logo').src = isLight ? "https://i.imgur.com/UEvIK9K.png" : "https://i.imgur.com/qdIS9iU.png";
 };
 
-// INICIALIZACIÓN
+// INICIALIZAR APP
+loadState();
 renderWarehouses();
