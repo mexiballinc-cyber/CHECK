@@ -27,13 +27,52 @@ function saveState() {
   localStorage.setItem('check_app_data_v2', JSON.stringify(state));
 }
 
-// CONVERTIR IMÁGENES A BASE64
-function fileToBase64(file) {
+// CONVERTIR Y COMPRIMIR IMÁGENES A BASE64 (A PRUEBA DE FALLOS)
+function processImage(file) {
   return new Promise((resolve) => {
-    if (!file) resolve(null);
+    if (!file) return resolve(null);
+
+    // Timeout de seguridad: si tarda más de 500ms, aborta para no congelar la app
+    const timer = setTimeout(() => resolve(null), 500);
+
     const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = () => resolve(null);
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        clearTimeout(timer);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const maxDim = 300;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height *= maxDim / width;
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width *= maxDim / height;
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.6));
+      };
+      img.onerror = () => {
+        clearTimeout(timer);
+        resolve(null);
+      };
+      img.src = e.target.result;
+    };
+    reader.onerror = () => {
+      clearTimeout(timer);
+      resolve(null);
+    };
     reader.readAsDataURL(file);
   });
 }
@@ -478,38 +517,41 @@ document.getElementById('btn-open-create-product').onclick = () => {
 };
 document.getElementById('close-modal-product').onclick = () => document.getElementById('modal-product').classList.add('hidden');
 
-document.getElementById('form-product').onsubmit = async (e) => {
+// FORMULARIO DE PRODUCTO CON IMAGEN COMPRIMIDA Y SEGURA
+document.getElementById('form-product').onsubmit = function(e) {
   e.preventDefault();
   const fileInput = document.getElementById('prod-image-file');
-  const imageBase64 = fileInput.files[0] ? await fileToBase64(fileInput.files[0]) : null;
+  const file = fileInput.files ? fileInput.files[0] : null;
 
-  const editId = document.getElementById('prod-id-edit').value;
-  const w = state.warehouses.find(item => item.id === activeWarehouseId);
+  processImage(file).then(imageBase64 => {
+    const editId = document.getElementById('prod-id-edit').value;
+    const w = state.warehouses.find(item => item.id === activeWarehouseId);
 
-  if (editId) {
-    const p = w.products.find(item => item.id === editId);
-    p.name = document.getElementById('prod-name').value;
-    p.buyPrice = parseFloat(document.getElementById('prod-buy-price').value);
-    p.sellPrice = parseFloat(document.getElementById('prod-sell-price').value);
-    p.stock = parseInt(document.getElementById('prod-stock').value);
-    p.categoryId = document.getElementById('prod-category-select').value;
-    if (imageBase64) p.image = imageBase64;
-  } else {
-    w.products.push({
-      id: Date.now().toString(),
-      name: document.getElementById('prod-name').value,
-      buyPrice: parseFloat(document.getElementById('prod-buy-price').value),
-      sellPrice: parseFloat(document.getElementById('prod-sell-price').value),
-      stock: parseInt(document.getElementById('prod-stock').value),
-      categoryId: document.getElementById('prod-category-select').value,
-      image: imageBase64
-    });
-  }
+    if (editId) {
+      const p = w.products.find(item => item.id === editId);
+      p.name = document.getElementById('prod-name').value;
+      p.buyPrice = parseFloat(document.getElementById('prod-buy-price').value);
+      p.sellPrice = parseFloat(document.getElementById('prod-sell-price').value);
+      p.stock = parseInt(document.getElementById('prod-stock').value);
+      p.categoryId = document.getElementById('prod-category-select').value;
+      if (imageBase64) p.image = imageBase64;
+    } else {
+      w.products.push({
+        id: Date.now().toString(),
+        name: document.getElementById('prod-name').value,
+        buyPrice: parseFloat(document.getElementById('prod-buy-price').value),
+        sellPrice: parseFloat(document.getElementById('prod-sell-price').value),
+        stock: parseInt(document.getElementById('prod-stock').value),
+        categoryId: document.getElementById('prod-category-select').value,
+        image: imageBase64
+      });
+    }
 
-  saveState();
-  document.getElementById('modal-product').classList.add('hidden');
-  document.getElementById('form-product').reset();
-  renderWarehouseProducts();
+    saveState();
+    document.getElementById('modal-product').classList.add('hidden');
+    document.getElementById('form-product').reset();
+    renderWarehouseProducts();
+  });
 };
 
 document.getElementById('btn-open-create-store').onclick = () => {
@@ -520,29 +562,33 @@ document.getElementById('btn-open-create-store').onclick = () => {
 };
 document.getElementById('close-modal-store').onclick = () => document.getElementById('modal-store').classList.add('hidden');
 
-document.getElementById('form-store').onsubmit = async (e) => {
+// FORMULARIO DE TIENDA CON IMAGEN COMPRIMIDA Y SEGURA
+document.getElementById('form-store').onsubmit = function(e) {
   e.preventDefault();
   const fileInput = document.getElementById('store-image-file');
-  const imageBase64 = fileInput.files[0] ? await fileToBase64(fileInput.files[0]) : null;
-  const editId = document.getElementById('store-id-edit').value;
+  const file = fileInput.files ? fileInput.files[0] : null;
 
-  if (editId) {
-    const s = state.stores.find(item => item.id === editId);
-    s.name = document.getElementById('store-name').value;
-    if (imageBase64) s.image = imageBase64;
-  } else {
-    state.stores.push({
-      id: Date.now().toString(),
-      name: document.getElementById('store-name').value,
-      image: imageBase64,
-      products: []
-    });
-  }
+  processImage(file).then(imageBase64 => {
+    const editId = document.getElementById('store-id-edit').value;
 
-  saveState();
-  document.getElementById('modal-store').classList.add('hidden');
-  document.getElementById('form-store').reset();
-  renderStores();
+    if (editId) {
+      const s = state.stores.find(item => item.id === editId);
+      s.name = document.getElementById('store-name').value;
+      if (imageBase64) s.image = imageBase64;
+    } else {
+      state.stores.push({
+        id: Date.now().toString(),
+        name: document.getElementById('store-name').value,
+        image: imageBase64,
+        products: []
+      });
+    }
+
+    saveState();
+    document.getElementById('modal-store').classList.add('hidden');
+    document.getElementById('form-store').reset();
+    renderStores();
+  });
 };
 
 document.getElementById('close-modal-transfer').onclick = () => document.getElementById('modal-transfer').classList.add('hidden');
