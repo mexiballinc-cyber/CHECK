@@ -27,12 +27,10 @@ function saveState() {
   localStorage.setItem('check_app_data_v2', JSON.stringify(state));
 }
 
-// CONVERTIR Y COMPRIMIR IMÁGENES A BASE64 (A PRUEBA DE FALLOS)
+// CONVERTIR Y COMPRIMIR IMÁGENES A BASE64
 function processImage(file) {
   return new Promise((resolve) => {
     if (!file) return resolve(null);
-
-    // Timeout de seguridad: si tarda más de 500ms, aborta para no congelar la app
     const timer = setTimeout(() => resolve(null), 500);
 
     const reader = new FileReader();
@@ -63,16 +61,10 @@ function processImage(file) {
         ctx.drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', 0.6));
       };
-      img.onerror = () => {
-        clearTimeout(timer);
-        resolve(null);
-      };
+      img.onerror = () => { clearTimeout(timer); resolve(null); };
       img.src = e.target.result;
     };
-    reader.onerror = () => {
-      clearTimeout(timer);
-      resolve(null);
-    };
+    reader.onerror = () => { clearTimeout(timer); resolve(null); };
     reader.readAsDataURL(file);
   });
 }
@@ -396,7 +388,7 @@ function renderStoreProducts() {
   });
 }
 
-// REGISTRAR VENTA
+// REGISTRAR VENTA (GUARDA ISO FECHA Y FORMATO VISUAL)
 window.sellProduct = function(prodId) {
   const store = state.stores.find(s => s.id === activeStoreId);
   const p = store.products.find(item => item.id === prodId);
@@ -406,23 +398,42 @@ window.sellProduct = function(prodId) {
   p.stock -= 1;
   const profit = parseFloat(p.sellPrice) - parseFloat(p.buyPrice);
 
+  const now = new Date();
+  const isoDate = now.toISOString().split('T')[0]; // "YYYY-MM-DD" para filtrado preciso
+
   state.sales.push({
     productName: p.name,
     sellPrice: parseFloat(p.sellPrice),
     profit: profit,
-    date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date().toLocaleDateString()
+    rawDate: isoDate,
+    date: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + now.toLocaleDateString()
   });
 
   saveState();
   renderStoreProducts();
 };
 
-// REPORTES Y UTILIDADES
+// REPORTES Y UTILIDADES CON FILTRADO POR FECHAS
 function renderMetrics() {
+  const startDate = document.getElementById('filter-date-start')?.value;
+  const endDate = document.getElementById('filter-date-end')?.value;
+
+  let filteredSales = state.sales;
+
+  // Filtrar ventas por el rango seleccionado
+  if (startDate || endDate) {
+    filteredSales = filteredSales.filter(s => {
+      const saleDate = s.rawDate || s.date.split(' - ')[1].split('/').reverse().join('-');
+      if (startDate && saleDate < startDate) return false;
+      if (endDate && saleDate > endDate) return false;
+      return true;
+    });
+  }
+
   let totalSales = 0;
   let totalProfit = 0;
 
-  state.sales.forEach(s => {
+  filteredSales.forEach(s => {
     totalSales += s.sellPrice;
     totalProfit += s.profit;
   });
@@ -431,9 +442,9 @@ function renderMetrics() {
   document.getElementById('metric-total-profit').textContent = `$${totalProfit.toFixed(2)}`;
 
   const historyList = document.getElementById('sales-history-list');
-  historyList.innerHTML = state.sales.length === 0
-    ? `<p style="opacity:0.6; margin-top:10px;">Aún no se registran ventas.</p>`
-    : state.sales.slice().reverse().map(s => `
+  historyList.innerHTML = filteredSales.length === 0
+    ? `<p style="opacity:0.6; margin-top:10px;">No hay ventas registradas en este periodo.</p>`
+    : filteredSales.slice().reverse().map(s => `
         <div style="background:var(--glass-bg); border:1px solid var(--glass-border); padding:12px; border-radius:12px; margin-top:8px; display:flex; justify-content:space-between; backdrop-filter:blur(8px);">
           <div>
             <strong>${s.productName}</strong>
@@ -446,6 +457,14 @@ function renderMetrics() {
         </div>
       `).join('');
 }
+
+// EVENTOS DE BOTONES DE FILTRO DE FECHAS
+document.getElementById('btn-apply-date-filter').onclick = renderMetrics;
+document.getElementById('btn-clear-date-filter').onclick = () => {
+  document.getElementById('filter-date-start').value = "";
+  document.getElementById('filter-date-end').value = "";
+  renderMetrics();
+};
 
 // EVENTOS DE CREACIÓN DE MODALES Y FORMULARIOS
 document.getElementById('btn-open-create-warehouse').onclick = () => {
@@ -517,7 +536,6 @@ document.getElementById('btn-open-create-product').onclick = () => {
 };
 document.getElementById('close-modal-product').onclick = () => document.getElementById('modal-product').classList.add('hidden');
 
-// FORMULARIO DE PRODUCTO CON IMAGEN COMPRIMIDA Y SEGURA
 document.getElementById('form-product').onsubmit = function(e) {
   e.preventDefault();
   const fileInput = document.getElementById('prod-image-file');
@@ -562,7 +580,6 @@ document.getElementById('btn-open-create-store').onclick = () => {
 };
 document.getElementById('close-modal-store').onclick = () => document.getElementById('modal-store').classList.add('hidden');
 
-// FORMULARIO DE TIENDA CON IMAGEN COMPRIMIDA Y SEGURA
 document.getElementById('form-store').onsubmit = function(e) {
   e.preventDefault();
   const fileInput = document.getElementById('store-image-file');
