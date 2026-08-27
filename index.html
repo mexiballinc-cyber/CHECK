@@ -10,7 +10,7 @@
 </head>
 <body class="dark-theme">
 
-  <!-- NAVBAR -->
+  <!-- NAVBAR GLASSMORPHISM -->
   <header class="navbar">
     <div class="brand">
       <img id="app-logo" src="https://i.imgur.com/qdIS9iU.png" alt="Check Logo">
@@ -43,7 +43,7 @@
       <div id="warehouses-grid" class="cards-grid"></div>
     </section>
 
-    <!-- VISTA: DETALLE DE UN ALMACÉN (CATEGORÍAS Y PRODUCTOS) -->
+    <!-- VISTA: DETALLE DE UN ALMACÉN -->
     <section id="view-warehouse-detail" class="view-section hidden">
       <button id="btn-back-to-warehouses" class="btn-secondary">← Volver a almacenes</button>
       <div class="section-header" style="margin-top: 15px;">
@@ -92,12 +92,13 @@
     </section>
   </main>
 
-  <!-- MODAL: CREAR ALMACÉN -->
+  <!-- MODAL: CREAR/EDITAR ALMACÉN -->
   <div id="modal-warehouse" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content glass-card">
       <span class="close-btn" id="close-modal-warehouse">&times;</span>
-      <h3>Crear Almacén</h3>
+      <h3 id="modal-warehouse-title">Crear Almacén</h3>
       <form id="form-warehouse">
+        <input type="hidden" id="warehouse-id-edit">
         <input type="text" id="warehouse-name" placeholder="Nombre del Almacén" required>
         <button type="submit" class="btn-primary full-width">Guardar</button>
       </form>
@@ -106,7 +107,7 @@
 
   <!-- MODAL: CREAR/EDITAR CATEGORÍA -->
   <div id="modal-category" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content glass-card">
       <span class="close-btn" id="close-modal-category">&times;</span>
       <h3 id="modal-category-title">Crear Categoría</h3>
       <form id="form-category">
@@ -119,7 +120,7 @@
 
   <!-- MODAL: CREAR/EDITAR PRODUCTO -->
   <div id="modal-product" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content glass-card">
       <span class="close-btn" id="close-modal-product">&times;</span>
       <h3 id="modal-product-title">Agregar Producto</h3>
       <form id="form-product">
@@ -140,12 +141,13 @@
     </div>
   </div>
 
-  <!-- MODAL: CREAR TIENDA -->
+  <!-- MODAL: CREAR/EDITAR TIENDA -->
   <div id="modal-store" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content glass-card">
       <span class="close-btn" id="close-modal-store">&times;</span>
-      <h3>Crear Tienda</h3>
+      <h3 id="modal-store-title">Crear Tienda</h3>
       <form id="form-store">
+        <input type="hidden" id="store-id-edit">
         <input type="text" id="store-name" placeholder="Nombre de la Tienda" required>
         <label style="font-size: 0.8rem; opacity: 0.8;">Foto desde Galería:</label>
         <input type="file" id="store-image-file" accept="image/*">
@@ -154,33 +156,26 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET / MENU INFERIOR DE ACCIONES PARA PRODUCTO -->
+  <!-- BOTTOM SHEET DE PRODUCTO CON GLASSMORPHISM Y BORRADO -->
   <div id="bottom-sheet" class="bottom-sheet hidden">
-    <div class="sheet-content">
+    <div class="sheet-content glass-card">
       <div id="sheet-prod-info" class="sheet-header"></div>
       <div class="sheet-actions">
         
         <button id="sheet-btn-edit" class="sheet-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 20h9"></path>
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-          </svg>
-          Editar
+          ✏️ Editar Producto
         </button>
 
         <button id="sheet-btn-add-stock" class="sheet-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Añadir Stock
+          ➕ Añadir Stock
         </button>
 
         <button id="sheet-btn-check" class="sheet-btn check-action">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          Check (Mandar a Tienda)
+          ✓ Check (Mandar a Tienda)
+        </button>
+
+        <button id="sheet-btn-delete" class="sheet-btn delete-action">
+          🗑️ Eliminar Producto
         </button>
 
       </div>
@@ -190,7 +185,7 @@
 
   <!-- MODAL CHECK: ELEGIR TIENDA Y CANTIDAD -->
   <div id="modal-transfer" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content glass-card">
       <span class="close-btn" id="close-modal-transfer">&times;</span>
       <h3>Mover a Tienda (Check)</h3>
       <form id="form-transfer">
