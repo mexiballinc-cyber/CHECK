@@ -1,23 +1,30 @@
-// MEMORIA LOCAL CON PERSISTENCIA
+// ESTADO GLOBAL CON ESTRUCTURA BLINDADA
 let state = {
   warehouses: [],
   stores: [],
   sales: []
 };
 
+// CARGAR DATOS SIN PÉRDIDA
 function loadState() {
-  const saved = localStorage.getItem('check_app_data');
+  const saved = localStorage.getItem('check_app_data_v2');
   if (saved) {
     try {
-      state = JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      state = {
+        warehouses: parsed.warehouses || [],
+        stores: parsed.stores || [],
+        sales: parsed.sales || []
+      };
     } catch (e) {
-      console.error("Error al cargar localStorage", e);
+      console.error("Error al leer localStorage", e);
     }
   }
 }
 
+// GUARDADO AUTOMÁTICO INMEDIATO
 function saveState() {
-  localStorage.setItem('check_app_data', JSON.stringify(state));
+  localStorage.setItem('check_app_data_v2', JSON.stringify(state));
 }
 
 // CONVERTIR IMÁGENES A BASE64
@@ -31,7 +38,7 @@ function fileToBase64(file) {
   });
 }
 
-// TABS DE NAVEGACIÓN
+// CONTROL DE PESTAÑAS (TABS)
 const tabs = {
   warehouses: { btn: document.getElementById('tab-btn-warehouses'), view: document.getElementById('view-warehouses') },
   stores: { btn: document.getElementById('tab-btn-stores'), view: document.getElementById('view-stores') },
@@ -59,7 +66,7 @@ let activeWarehouseId = null;
 let activeStoreId = null;
 let activeProductId = null;
 
-// RENDER Y GESTIÓN DE ALMACENES
+// GESTIÓN DE ALMACENES
 function renderWarehouses() {
   const container = document.getElementById('warehouses-grid');
   container.innerHTML = state.warehouses.length === 0
@@ -99,7 +106,7 @@ window.editWarehouse = function(id) {
 };
 
 window.deleteWarehouse = function(id) {
-  if (confirm("¿Estás seguro de eliminar este almacén y sus contenidos?")) {
+  if (confirm("¿Estás seguro de eliminar este almacén y sus productos?")) {
     state.warehouses = state.warehouses.filter(w => w.id !== id);
     saveState();
     renderWarehouses();
@@ -112,7 +119,7 @@ document.getElementById('btn-back-to-warehouses').onclick = () => {
   renderWarehouses();
 };
 
-// CATEGORÍAS Y PRODUCTOS
+// CATEGORÍAS Y PRODUCTOS EN ALMACÉN
 function renderWarehouseProducts() {
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   const container = document.getElementById('categories-products-container');
@@ -145,7 +152,7 @@ function renderWarehouseProducts() {
           <div class="item-card glass-card" onclick="openProductSheet('${p.id}')">
             <img src="${p.image || 'https://via.placeholder.com/100?text=Sin+Foto'}">
             <h4>${p.name}</h4>
-            <span class="subtext">Stock: ${p.stock}</span>
+            <span class="subtext">Stock: <strong>${p.stock}</strong></span>
             <span class="subtext" style="color:#22c55e; font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
           </div>
         `;
@@ -164,7 +171,7 @@ window.editCategory = function(catId, catName) {
 };
 
 window.deleteCategory = function(catId) {
-  if (confirm("¿Estás seguro de eliminar esta categoría?")) {
+  if (confirm("¿Eliminar categoría?")) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
     w.categories = w.categories.filter(c => c.id !== catId);
     saveState();
@@ -172,7 +179,7 @@ window.deleteCategory = function(catId) {
   }
 };
 
-// BOTTOM SHEET (ACCIONES Y EDICIÓN/BORRADO DE PRODUCTO)
+// BOTTOM SHEET DE OPCIONES
 const sheet = document.getElementById('bottom-sheet');
 
 function openProductSheet(prodId) {
@@ -210,7 +217,7 @@ document.getElementById('sheet-btn-edit').onclick = () => {
 
 document.getElementById('sheet-btn-delete').onclick = () => {
   sheet.classList.add('hidden');
-  if (confirm("¿Eliminar este producto permanentemente del almacén?")) {
+  if (confirm("¿Eliminar este producto?")) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
     w.products = w.products.filter(p => p.id !== activeProductId);
     saveState();
@@ -220,7 +227,7 @@ document.getElementById('sheet-btn-delete').onclick = () => {
 
 document.getElementById('sheet-btn-add-stock').onclick = () => {
   sheet.classList.add('hidden');
-  const addQty = prompt("¿Cuántas piezas deseas añadir al stock?");
+  const addQty = prompt("¿Cuántas piezas deseas añadir?");
   if (addQty && !isNaN(addQty) && parseInt(addQty) > 0) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
     const p = w.products.find(item => item.id === activeProductId);
@@ -230,16 +237,15 @@ document.getElementById('sheet-btn-add-stock').onclick = () => {
   }
 };
 
-// CHECK (ENVIAR A TIENDA Y CERRAR MODALES)
+// MODAL CHECK: ENVIAR PRODUCTO A TIENDA (CORREGIDO)
 document.getElementById('sheet-btn-check').onclick = () => {
   sheet.classList.add('hidden');
-  const storeSelect = document.getElementById('transfer-store-select');
-  storeSelect.innerHTML = state.stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-
   if (state.stores.length === 0) {
     alert("Primero debes crear una tienda.");
     return;
   }
+  const storeSelect = document.getElementById('transfer-store-select');
+  storeSelect.innerHTML = state.stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
   document.getElementById('modal-transfer').classList.remove('hidden');
 };
 
@@ -252,12 +258,14 @@ document.getElementById('form-transfer').onsubmit = (e) => {
   const p = w.products.find(item => item.id === activeProductId);
 
   if (qty > p.stock) {
-    alert("No tienes suficiente stock en el almacén.");
+    alert("No tienes suficiente stock disponible.");
     return;
   }
 
+  // Restar de almacén
   p.stock -= qty;
 
+  // Sumar a la tienda objetivo
   const store = state.stores.find(s => s.id === targetStoreId);
   if (!store.products) store.products = [];
 
@@ -268,13 +276,16 @@ document.getElementById('form-transfer').onsubmit = (e) => {
     store.products.push({ ...p, stock: qty });
   }
 
+  // Guardar en disco duro/localstorage de inmediato
   saveState();
+
+  // CIERRA MODALES AUTOMÁTICAMENTE Y RECARGA LA VISTA AL INSTANTE
   document.getElementById('modal-transfer').classList.add('hidden');
   document.getElementById('form-transfer').reset();
   renderWarehouseProducts();
 };
 
-// TIENDAS Y VENTAS
+// TIENDAS Y VENTAS EN TIEMPO REAL
 function renderStores() {
   const container = document.getElementById('stores-grid');
   container.innerHTML = state.stores.length === 0
@@ -287,7 +298,7 @@ function renderStores() {
           </div>
           <img src="${s.image || 'https://via.placeholder.com/100?text=Tienda'}">
           <h4>${s.name}</h4>
-          <span class="subtext">${(s.products || []).length} Productos</span>
+          <span class="subtext">${(s.products || []).length} Productos en exhibición</span>
         </div>
       `).join('');
 }
@@ -332,7 +343,7 @@ function renderStoreProducts() {
   container.innerHTML = "";
 
   if (!store || !store.products || store.products.length === 0) {
-    container.innerHTML = `<p style="opacity:0.6; grid-column: span 2;">Sin productos en exhibición.</p>`;
+    container.innerHTML = `<p style="opacity:0.6; grid-column: span 2;">Sin productos para vender. Manda algunos desde un almacén usando la opción Check.</p>`;
     return;
   }
 
@@ -351,11 +362,12 @@ function renderStoreProducts() {
   });
 }
 
+// REGISTRAR VENTA Y GUARDAR AL INSTANTE
 window.sellProduct = function(prodId) {
   const store = state.stores.find(s => s.id === activeStoreId);
   const p = store.products.find(item => item.id === prodId);
 
-  if (p.stock <= 0) return alert("Producto agotado en tienda.");
+  if (!p || p.stock <= 0) return alert("Producto agotado en tienda.");
 
   p.stock -= 1;
   const profit = parseFloat(p.sellPrice) - parseFloat(p.buyPrice);
@@ -364,14 +376,14 @@ window.sellProduct = function(prodId) {
     productName: p.name,
     sellPrice: parseFloat(p.sellPrice),
     profit: profit,
-    date: new Date().toLocaleString()
+    date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date().toLocaleDateString()
   });
 
-  saveState();
-  renderStoreProducts();
+  saveState(); // PERSISTENCIA TOTAL
+  renderStoreProducts(); // RECONSTRUIR TIENDA EN TIEMPO REAL
 };
 
-// MÉTRICAS Y UTILIDADES
+// REPORTES Y UTILIDADES PERSISTENTES
 function renderMetrics() {
   let totalSales = 0;
   let totalProfit = 0;
@@ -401,9 +413,7 @@ function renderMetrics() {
       `).join('');
 }
 
-// SUBMITS DE MODALES
-
-// Almacén
+// EVENTOS DE CREACIÓN DE MODALES
 document.getElementById('btn-open-create-warehouse').onclick = () => {
   document.getElementById('modal-warehouse-title').textContent = "Crear Almacén";
   document.getElementById('warehouse-id-edit').value = "";
@@ -429,7 +439,6 @@ document.getElementById('form-warehouse').onsubmit = (e) => {
   renderWarehouses();
 };
 
-// Categoría
 document.getElementById('btn-open-create-category').onclick = () => {
   document.getElementById('modal-category-title').textContent = "Crear Categoría";
   document.getElementById('cat-id-edit').value = "";
@@ -456,7 +465,6 @@ document.getElementById('form-category').onsubmit = (e) => {
   renderWarehouseProducts();
 };
 
-// Producto
 document.getElementById('btn-open-create-product').onclick = () => {
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   if (!w.categories || w.categories.length === 0) {
@@ -506,7 +514,6 @@ document.getElementById('form-product').onsubmit = async (e) => {
   renderWarehouseProducts();
 };
 
-// Tienda
 document.getElementById('btn-open-create-store').onclick = () => {
   document.getElementById('modal-store-title').textContent = "Crear Tienda";
   document.getElementById('store-id-edit').value = "";
@@ -541,13 +548,13 @@ document.getElementById('form-store').onsubmit = async (e) => {
 
 document.getElementById('close-modal-transfer').onclick = () => document.getElementById('modal-transfer').classList.add('hidden');
 
-// MODO OSCURO / CLARO
+// MODO OSCURO
 document.getElementById('btn-theme-toggle').onclick = () => {
   document.body.classList.toggle('light-theme');
   const isLight = document.body.classList.contains('light-theme');
   document.getElementById('app-logo').src = isLight ? "https://i.imgur.com/UEvIK9K.png" : "https://i.imgur.com/qdIS9iU.png";
 };
 
-// INICIALIZAR APP
+// INICIALIZACIÓN
 loadState();
 renderWarehouses();
