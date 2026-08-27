@@ -77,6 +77,26 @@
     <!-- VISTA: UTILIDADES Y VENTAS -->
     <section id="view-metrics" class="view-section hidden">
       <h2>Reporte de Ventas y Utilidades</h2>
+
+      <!-- FILTRO DE FECHAS GLASSMORPHISM -->
+      <div class="glass-card" style="padding: 15px; margin-bottom: 15px;">
+        <h4 style="margin-bottom: 10px; font-size: 0.95rem;">📅 Filtrar por Fechas</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+          <div style="flex: 1; min-width: 120px;">
+            <label style="font-size: 0.75rem; opacity: 0.8; display: block; margin-bottom: 4px;">Desde:</label>
+            <input type="date" id="filter-date-start" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: inherit;">
+          </div>
+          <div style="flex: 1; min-width: 120px;">
+            <label style="font-size: 0.75rem; opacity: 0.8; display: block; margin-bottom: 4px;">Hasta:</label>
+            <input type="date" id="filter-date-end" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: inherit;">
+          </div>
+          <div style="display: flex; gap: 6px; width: 100%; margin-top: 5px;">
+            <button id="btn-apply-date-filter" class="btn-primary" style="flex: 1; padding: 8px; font-size: 0.85rem;">🔍 Filtrar</button>
+            <button id="btn-clear-date-filter" style="flex: 1; padding: 8px; font-size: 0.85rem; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 8px; color: inherit;">Ver Todo</button>
+          </div>
+        </div>
+      </div>
+
       <div class="metrics-cards">
         <div class="metric-card">
           <span>Venta Total</span>
@@ -156,28 +176,15 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET DE PRODUCTO CON GLASSMORPHISM Y BORRADO -->
+  <!-- BOTTOM SHEET DE PRODUCTO -->
   <div id="bottom-sheet" class="bottom-sheet hidden">
     <div class="sheet-content glass-card">
       <div id="sheet-prod-info" class="sheet-header"></div>
       <div class="sheet-actions">
-        
-        <button id="sheet-btn-edit" class="sheet-btn">
-          ✏️ Editar Producto
-        </button>
-
-        <button id="sheet-btn-add-stock" class="sheet-btn">
-          ➕ Añadir Stock
-        </button>
-
-        <button id="sheet-btn-check" class="sheet-btn check-action">
-          ✓ Check (Mandar a Tienda)
-        </button>
-
-        <button id="sheet-btn-delete" class="sheet-btn delete-action">
-          🗑️ Eliminar Producto
-        </button>
-
+        <button id="sheet-btn-edit" class="sheet-btn">✏️ Editar Producto</button>
+        <button id="sheet-btn-add-stock" class="sheet-btn">➕ Añadir Stock</button>
+        <button id="sheet-btn-check" class="sheet-btn check-action">✓ Check (Mandar a Tienda)</button>
+        <button id="sheet-btn-delete" class="sheet-btn delete-action">🗑️ Eliminar Producto</button>
       </div>
       <button id="close-sheet" class="btn-secondary full-width" style="margin-top: 10px;">Cancelar</button>
     </div>
