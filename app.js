@@ -237,7 +237,7 @@ document.getElementById('sheet-btn-add-stock').onclick = () => {
   }
 };
 
-// MODAL CHECK: ENVIAR PRODUCTO A TIENDA (CORREGIDO)
+// MODAL CHECK: ENVIAR PRODUCTO A TIENDA
 document.getElementById('sheet-btn-check').onclick = () => {
   sheet.classList.add('hidden');
   if (state.stores.length === 0) {
@@ -262,10 +262,8 @@ document.getElementById('form-transfer').onsubmit = (e) => {
     return;
   }
 
-  // Restar de almacén
   p.stock -= qty;
 
-  // Sumar a la tienda objetivo
   const store = state.stores.find(s => s.id === targetStoreId);
   if (!store.products) store.products = [];
 
@@ -276,10 +274,7 @@ document.getElementById('form-transfer').onsubmit = (e) => {
     store.products.push({ ...p, stock: qty });
   }
 
-  // Guardar en disco duro/localstorage de inmediato
   saveState();
-
-  // CIERRA MODALES AUTOMÁTICAMENTE Y RECARGA LA VISTA AL INSTANTE
   document.getElementById('modal-transfer').classList.add('hidden');
   document.getElementById('form-transfer').reset();
   renderWarehouseProducts();
@@ -362,7 +357,7 @@ function renderStoreProducts() {
   });
 }
 
-// REGISTRAR VENTA Y GUARDAR AL INSTANTE
+// REGISTRAR VENTA
 window.sellProduct = function(prodId) {
   const store = state.stores.find(s => s.id === activeStoreId);
   const p = store.products.find(item => item.id === prodId);
@@ -379,11 +374,11 @@ window.sellProduct = function(prodId) {
     date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date().toLocaleDateString()
   });
 
-  saveState(); // PERSISTENCIA TOTAL
-  renderStoreProducts(); // RECONSTRUIR TIENDA EN TIEMPO REAL
+  saveState();
+  renderStoreProducts();
 };
 
-// REPORTES Y UTILIDADES PERSISTENTES
+// REPORTES Y UTILIDADES
 function renderMetrics() {
   let totalSales = 0;
   let totalProfit = 0;
@@ -413,7 +408,7 @@ function renderMetrics() {
       `).join('');
 }
 
-// EVENTOS DE CREACIÓN DE MODALES
+// EVENTOS DE CREACIÓN DE MODALES Y FORMULARIOS
 document.getElementById('btn-open-create-warehouse').onclick = () => {
   document.getElementById('modal-warehouse-title').textContent = "Crear Almacén";
   document.getElementById('warehouse-id-edit').value = "";
@@ -436,6 +431,7 @@ document.getElementById('form-warehouse').onsubmit = (e) => {
 
   saveState();
   document.getElementById('modal-warehouse').classList.add('hidden');
+  document.getElementById('form-warehouse').reset();
   renderWarehouses();
 };
 
@@ -462,6 +458,7 @@ document.getElementById('form-category').onsubmit = (e) => {
 
   saveState();
   document.getElementById('modal-category').classList.add('hidden');
+  document.getElementById('form-category').reset();
   renderWarehouseProducts();
 };
 
@@ -484,7 +481,7 @@ document.getElementById('close-modal-product').onclick = () => document.getEleme
 document.getElementById('form-product').onsubmit = async (e) => {
   e.preventDefault();
   const fileInput = document.getElementById('prod-image-file');
-  const imageBase64 = await fileToBase64(fileInput.files[0]);
+  const imageBase64 = fileInput.files[0] ? await fileToBase64(fileInput.files[0]) : null;
 
   const editId = document.getElementById('prod-id-edit').value;
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
@@ -511,6 +508,7 @@ document.getElementById('form-product').onsubmit = async (e) => {
 
   saveState();
   document.getElementById('modal-product').classList.add('hidden');
+  document.getElementById('form-product').reset();
   renderWarehouseProducts();
 };
 
@@ -525,7 +523,7 @@ document.getElementById('close-modal-store').onclick = () => document.getElement
 document.getElementById('form-store').onsubmit = async (e) => {
   e.preventDefault();
   const fileInput = document.getElementById('store-image-file');
-  const imageBase64 = await fileToBase64(fileInput.files[0]);
+  const imageBase64 = fileInput.files[0] ? await fileToBase64(fileInput.files[0]) : null;
   const editId = document.getElementById('store-id-edit').value;
 
   if (editId) {
@@ -543,6 +541,7 @@ document.getElementById('form-store').onsubmit = async (e) => {
 
   saveState();
   document.getElementById('modal-store').classList.add('hidden');
+  document.getElementById('form-store').reset();
   renderStores();
 };
 
