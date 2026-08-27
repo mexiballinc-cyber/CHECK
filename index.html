@@ -104,12 +104,13 @@
     </div>
   </div>
 
-  <!-- MODAL: CREAR CATEGORÍA -->
+  <!-- MODAL: CREAR/EDITAR CATEGORÍA -->
   <div id="modal-category" class="modal hidden">
     <div class="modal-content">
       <span class="close-btn" id="close-modal-category">&times;</span>
-      <h3>Crear Categoría</h3>
+      <h3 id="modal-category-title">Crear Categoría</h3>
       <form id="form-category">
+        <input type="hidden" id="cat-id-edit">
         <input type="text" id="category-name" placeholder="Nombre de Categoría" required>
         <button type="submit" class="btn-primary full-width">Guardar</button>
       </form>
