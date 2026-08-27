@@ -1,0 +1,286 @@
+:root {
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --card-bg: #1e293b;
+  --border-color: #334155;
+  --primary: #22c55e;
+  --primary-hover: #16a34a;
+  --secondary-bg: #334155;
+  --accent-check: #10b981;
+}
+
+body.light-theme {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --secondary-bg: #f1f5f9;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* NAVBAR Y LOGO */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.brand span {
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.5px;
+}
+
+/* TAB BAR */
+.tab-bar {
+  display: flex;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-weight: 600;
+  opacity: 0.6;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+  opacity: 1;
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+}
+
+.main-container {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* BOTONES */
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: var(--secondary-bg);
+  color: inherit;
+  border: 1px solid var(--border-color);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* GRIDS Y TARJETAS */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.item-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.item-card img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: var(--secondary-bg);
+}
+
+.item-card h4 {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.item-card .subtext {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.category-block {
+  margin-bottom: 20px;
+}
+
+.category-block h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* BOTTOM SHEET */
+.bottom-sheet {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet-content {
+  background: var(--card-bg);
+  width: 100%;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.sheet-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--secondary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sheet-btn.check-action {
+  background: var(--accent-check);
+  color: white;
+  border: none;
+}
+
+/* METRICAS */
+.metrics-cards {
+  display: flex;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.metric-card {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.metric-card.highlight h3 {
+  color: var(--primary);
+}
+
+/* MODALES Y FORMULARIOS */
+.modal {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 300; padding: 15px;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px; width: 100%; max-width: 400px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer;
+}
+
+form {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 15px;
+}
+
+input, select {
+  padding: 10px; background: var(--secondary-bg);
+  border: 1px solid var(--border-color); color: inherit;
+  border-radius: 8px; outline: none;
+}
+
+.form-row {
+  display: flex; gap: 10px;
+}
+
+.form-row input, .form-row select {
+  flex: 1; width: 50%;
+}
+
+.full-width { width: 100%; }
+.hidden { display: none !important; }
