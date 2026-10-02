@@ -1,12 +1,12 @@
-// ESTADO GLOBAL CON ESTRUCTURA BLINDADA
+// ESTADO GLOBAL
 let state = {
   warehouses: [],
   stores: [],
   sales: []
 };
 
-// BASE DE DATOS INDEXEDDB (CAPACIDAD MASIVA E ILIMITADA)
-let db;
+let db; // IndexedDB local fallback
+
 function initDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('CheckAppDB', 1);
@@ -24,45 +24,72 @@ function initDB() {
   });
 }
 
-// CARGAR DATOS DESDE INDEXEDDB SIN PÉRDIDA
-async function loadState() {
-  await initDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction('appState', 'readonly');
-    const store = tx.objectStore('appState');
-    const request = store.get('main_data');
-
-    request.onsuccess = () => {
-      if (request.result) {
-        state = {
-          warehouses: request.result.warehouses || [],
-          stores: request.result.stores || [],
-          sales: request.result.sales || []
-        };
-      }
-      resolve();
-    };
-    request.onerror = () => resolve();
-  });
-}
-
-// GUARDADO AUTOMÁTICO INMEDIATO EN DISCO DURA
+// GUARDADO REALTIME EN FIREBASE & INDEXEDDB
 function saveState() {
-  if (!db) return;
-  try {
-    const tx = db.transaction('appState', 'readwrite');
-    const store = tx.objectStore('appState');
-    store.put(state, 'main_data');
-  } catch (e) {
-    console.error("Error guardando en IndexedDB:", e);
+  // Guardar en Firebase Realtime Database
+  if (window.firebaseDB && window.fbRef && window.fbSet) {
+    const dbRef = window.fbRef(window.firebaseDB, 'appState');
+    window.fbSet(dbRef, state).catch(err => console.error("Error guardando en Firebase:", err));
+  }
+
+  // Guardar copia local en IndexedDB
+  if (db) {
+    try {
+      const tx = db.transaction('appState', 'readwrite');
+      const store = tx.objectStore('appState');
+      store.put(state, 'main_data');
+    } catch (e) {
+      console.error("Error guardando en IndexedDB:", e);
+    }
   }
 }
 
-// CONVERTIR Y COMPRIMIR IMÁGENES A BASE64 (OPTIMIZADO)
+// ESCUCHAR CAMBIOS EN TIEMPO REAL DESDE FIREBASE
+function initFirebaseSync() {
+  initDB().then(() => {
+    if (window.firebaseDB && window.fbRef && window.fbOnValue) {
+      const dbRef = window.fbRef(window.firebaseDB, 'appState');
+      window.fbOnValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          state = {
+            warehouses: data.warehouses || [],
+            stores: data.stores || [],
+            sales: data.sales || []
+          };
+        }
+        refreshCurrentView();
+      });
+    }
+  });
+}
+
+function refreshCurrentView() {
+  const activeTab = document.querySelector('.tab-btn.active');
+  if (activeTab) {
+    if (activeTab.id === 'tab-btn-warehouses') {
+      if (!document.getElementById('view-warehouse-detail').classList.contains('hidden')) {
+        renderWarehouseProducts();
+      } else {
+        renderWarehouses();
+      }
+    } else if (activeTab.id === 'tab-btn-stores') {
+      if (!document.getElementById('view-store-detail').classList.contains('hidden')) {
+        renderStoreProducts();
+      } else {
+        renderStores();
+      }
+    } else if (activeTab.id === 'tab-btn-metrics') {
+      renderMetrics();
+    }
+  }
+}
+
+// PROCESADOR DE IMÁGENES
 function processImage(file) {
   return new Promise((resolve) => {
     if (!file) return resolve(null);
-    const timer = setTimeout(() => resolve(null), 500);
+    const timer = setTimeout(() => resolve(null), 800);
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -71,7 +98,7 @@ function processImage(file) {
         clearTimeout(timer);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const maxDim = 200; // Optimizado para tarjetas
+        const maxDim = 200;
         let width = img.width;
         let height = img.height;
 
@@ -90,7 +117,7 @@ function processImage(file) {
         canvas.width = width;
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.4)); // Alta compresión sin perder nitidez
+        resolve(canvas.toDataURL('image/jpeg', 0.4));
       };
       img.onerror = () => { clearTimeout(timer); resolve(null); };
       img.src = e.target.result;
@@ -449,7 +476,7 @@ function renderMetrics() {
   const startDate = document.getElementById('filter-date-start')?.value;
   const endDate = document.getElementById('filter-date-end')?.value;
 
-  let filteredSales = state.sales;
+  let filteredSales = state.sales || [];
 
   if (startDate || endDate) {
     filteredSales = filteredSales.filter(s => {
@@ -647,7 +674,7 @@ document.getElementById('btn-theme-toggle').onclick = () => {
   document.getElementById('app-logo').src = isLight ? "https://i.imgur.com/UEvIK9K.png" : "https://i.imgur.com/qdIS9iU.png";
 };
 
-// INICIALIZACIÓN CON CARGA ASÍNCRONA DESDE INDEXEDDB
-loadState().then(() => {
-  renderWarehouses();
+// INICIALIZACIÓN
+window.addEventListener('DOMContentLoaded', () => {
+  initFirebaseSync();
 });
