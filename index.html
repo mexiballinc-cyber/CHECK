@@ -203,33 +203,10 @@
       </form>
     </div>
   </div>
-
-  <!-- FIREBASE DEPLOYMENT & LOGIC SCRIPTS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDzLQxxCr90B3p1Jrm_BRLVC1y9zXw4pHg",
-      authDomain: "check-d662e.firebaseapp.com",
-      projectId: "check-d662e",
-      storageBucket: "check-d662e.firebasestorage.app",
-      messagingSenderId: "1018057230035",
-      appId: "1:1018057230035:web:ad7677ad4ee22006493626"
-    };
-
-    // Inicializar Firebase
-    const firebaseApp = initializeApp(firebaseConfig);
-    const database = getDatabase(firebaseApp);
-
-    // Hacer Firebase accesible globalmente para app.js
-    window.firebaseDB = database;
-    window.fbRef = ref;
-    window.fbSet = set;
-    window.fbOnValue = onValue;
-  </script>
-
+<!-- Tus scripts anteriores -->
   <script src="app.js"></script>
+  
+  <!-- SCRIPT NUEVO DE IMPORTAR/EXPORTAR -->
   <script src="backup.js"></script>
 </body>
 </html>
