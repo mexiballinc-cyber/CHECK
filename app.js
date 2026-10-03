@@ -5,7 +5,126 @@ let state = {
   sales: []
 };
 
-// BASE DE DATOS INDEXEDDB (CAPACIDAD MASIVA E ILIMITADA)
+// TRADUCCIONES E IDIOMA
+let currentLang = localStorage.getItem('check_lang') || 'es';
+
+const translations = {
+  es: {
+    warehousesTab: "Almacenes",
+    storesTab: "Tiendas",
+    metricsTab: "Utilidades",
+    myWarehouses: "Mis Almacenes",
+    myStores: "Mis Tiendas",
+    salesReport: "Reporte de Ventas y Utilidades",
+    addWarehouse: "+ Almacén",
+    addStore: "+ Tienda",
+    addCategory: "+ Categoría",
+    addProduct: "+ Producto",
+    filterDates: "📅 Filtrar por Fechas",
+    from: "Desde:",
+    to: "Hasta:",
+    filterBtn: "🔍 Filtrar",
+    seeAll: "Ver Todo",
+    totalSales: "Venta Total",
+    realProfit: "Utilidad Real",
+    salesHistory: "Historial de Ventas",
+    addEmailTitle: "Añadir Correo",
+    addEmailSub: "Ingresa tu correo para continuar.",
+    saveBtn: "Añadir"
+  },
+  en: {
+    warehousesTab: "Warehouses",
+    storesTab: "Stores",
+    metricsTab: "Metrics",
+    myWarehouses: "My Warehouses",
+    myStores: "My Stores",
+    salesReport: "Sales & Profit Report",
+    addWarehouse: "+ Warehouse",
+    addStore: "+ Store",
+    addCategory: "+ Category",
+    addProduct: "+ Product",
+    filterDates: "📅 Filter by Dates",
+    from: "From:",
+    to: "To:",
+    filterBtn: "🔍 Filter",
+    seeAll: "View All",
+    totalSales: "Total Sales",
+    realProfit: "Net Profit",
+    salesHistory: "Sales History",
+    addEmailTitle: "Add Email",
+    addEmailSub: "Enter your email to continue.",
+    saveBtn: "Add"
+  }
+};
+
+function updateLanguageUI() {
+  const t = translations[currentLang];
+  document.getElementById('tab-btn-warehouses').textContent = t.warehousesTab;
+  document.getElementById('tab-btn-stores').textContent = t.storesTab;
+  document.getElementById('tab-btn-metrics').textContent = t.metricsTab;
+
+  document.getElementById('txt-title-warehouses').textContent = t.myWarehouses;
+  document.getElementById('txt-title-stores').textContent = t.myStores;
+  document.getElementById('txt-title-metrics').textContent = t.salesReport;
+
+  document.getElementById('btn-open-create-warehouse').textContent = t.addWarehouse;
+  document.getElementById('btn-open-create-store').textContent = t.addStore;
+
+  document.getElementById('txt-filter-title').textContent = t.filterDates;
+  document.getElementById('txt-filter-from').textContent = t.from;
+  document.getElementById('txt-filter-to').textContent = t.to;
+  document.getElementById('btn-apply-date-filter').textContent = t.filterBtn;
+  document.getElementById('btn-clear-date-filter').textContent = t.seeAll;
+
+  document.getElementById('txt-total-sales').textContent = t.totalSales;
+  document.getElementById('txt-total-profit').textContent = t.realProfit;
+  document.getElementById('txt-sales-history').textContent = t.salesHistory;
+
+  document.getElementById('txt-email-title').textContent = t.addEmailTitle;
+  document.getElementById('txt-email-subtitle').textContent = t.addEmailSub;
+  document.getElementById('btn-save-email').textContent = t.saveBtn;
+}
+
+// TOGGLE IDIOMA
+document.getElementById('btn-lang-toggle').onclick = () => {
+  currentLang = currentLang === 'es' ? 'en' : 'es';
+  localStorage.setItem('check_lang', currentLang);
+  updateLanguageUI();
+};
+
+// COMPROBACIÓN DEL CORREO AL INICIAR
+function checkUserEmail() {
+  const savedEmail = localStorage.getItem('check_user_email');
+  const screen = document.getElementById('email-setup-screen');
+
+  if (!savedEmail) {
+    screen.classList.remove('hidden');
+  } else {
+    screen.classList.add('hidden');
+  }
+}
+
+document.getElementById('form-email-setup').onsubmit = function(e) {
+  e.preventDefault();
+  const email = document.getElementById('input-user-email').value.trim().toLowerCase();
+
+  if (email) {
+    // 1. Guardar en localStorage
+    localStorage.setItem('check_user_email', email);
+
+    // 2. Si Firebase Firestore está conectado en la app, registra el documento
+    if (window.db && window.setDoc && window.doc) {
+      window.setDoc(window.doc(window.db, "user_keys", email), {
+        email: email,
+        createdAt: new Date().toISOString()
+      }).catch(err => console.log("Guardado local registrado, Firestore diferido:", err));
+    }
+
+    document.getElementById('email-setup-screen').classList.add('hidden');
+  }
+};
+
+// BASE DE DATOS INDEXEDDB
 let db;
 function initDB() {
   return new Promise((resolve, reject) => {
@@ -24,7 +143,7 @@ function initDB() {
   });
 }
 
-// CARGAR DATOS DESDE INDEXEDDB SIN PÉRDIDA
+// CARGAR DATOS DESDE INDEXEDDB
 async function loadState() {
   await initDB();
   return new Promise((resolve) => {
@@ -46,7 +165,7 @@ async function loadState() {
   });
 }
 
-// GUARDADO AUTOMÁTICO INMEDIATO EN DISCO DURA
+// GUARDADO AUTOMÁTICO INMEDIATO
 function saveState() {
   if (!db) return;
   try {
@@ -58,7 +177,7 @@ function saveState() {
   }
 }
 
-// CONVERTIR Y COMPRIMIR IMÁGENES A BASE64 (OPTIMIZADO)
+// PROCESS IMAGE BASE64
 function processImage(file) {
   return new Promise((resolve) => {
     if (!file) return resolve(null);
@@ -71,7 +190,7 @@ function processImage(file) {
         clearTimeout(timer);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const maxDim = 200; // Optimizado para tarjetas
+        const maxDim = 200;
         let width = img.width;
         let height = img.height;
 
@@ -90,7 +209,7 @@ function processImage(file) {
         canvas.width = width;
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.4)); // Alta compresión sin perder nitidez
+        resolve(canvas.toDataURL('image/jpeg', 0.4));
       };
       img.onerror = () => { clearTimeout(timer); resolve(null); };
       img.src = e.target.result;
@@ -200,7 +319,7 @@ function renderWarehouseProducts() {
           <h3>${cat.name}</h3>
           <div class="category-actions">
             <button class="btn-icon-action" onclick="editCategory('${cat.id}', '${cat.name}')">✏️</button>
-            <button class="btn-icon-action" onclick="deleteCategory('${cat.id}')">🗑️</button>
+            <button class="btn-icon-action" onclick="deleteCategory('${cat.id}')">🗑️️</button>
           </div>
         </div>
         <div class="cards-grid">
@@ -350,7 +469,7 @@ function renderStores() {
     : state.stores.map(s => `
         <div class="item-card glass-card" onclick="openStore('${s.id}')">
           <div class="card-top-actions">
-            <button class="btn-mini-action" onclick="event.stopPropagation(); editStore('${s.id}')">✏️</button>
+            <button class="btn-mini-action" onclick="event.stopPropagation(); editStore('${s.id}')">✏️️</button>
             <button class="btn-mini-action" onclick="event.stopPropagation(); deleteStore('${s.id}')">🗑️</button>
           </div>
           <img src="${s.image || 'https://via.placeholder.com/100?text=Tienda'}">
@@ -647,7 +766,9 @@ document.getElementById('btn-theme-toggle').onclick = () => {
   document.getElementById('app-logo').src = isLight ? "https://i.imgur.com/UEvIK9K.png" : "https://i.imgur.com/qdIS9iU.png";
 };
 
-// INICIALIZACIÓN CON CARGA ASÍNCRONA DESDE INDEXEDDB
+// INICIALIZACIÓN
 loadState().then(() => {
+  checkUserEmail();
+  updateLanguageUI();
   renderWarehouses();
 });
