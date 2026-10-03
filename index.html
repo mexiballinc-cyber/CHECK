@@ -10,7 +10,7 @@
 </head>
 <body class="dark-theme">
 
-  <!-- PANTALLA INICIAL: VINCULAR CORREO (Se oculta si ya existe en localStorage) -->
+  <!-- PANTALLA INICIAL: VINCULAR CORREO -->
   <div id="email-setup-screen" class="email-screen hidden">
     <div class="glass-card email-card">
       <img src="https://i.imgur.com/xC7fUhQ.png" alt="Check Logo" class="email-logo">
@@ -31,13 +31,12 @@
       <span>Check</span>
     </div>
     <div class="navbar-actions">
-      <!-- BOTÓN DE IDIOMAS (Icono 🗣️ SVG) -->
-      <button id="btn-lang-toggle" class="icon-btn" title="Cambiar Idioma">
+      <!-- BOTÓN DE IDIOMAS (Icono Globo Terráqueo 🌐) -->
+      <button id="btn-lang-toggle" class="icon-btn" title="Cambiar Idioma / Change Language">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 2L11 13"></path>
-          <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
-          <circle cx="9" cy="18" r="3"></circle>
-          <path d="M18 11a5 5 0 0 0-5-5"></path>
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
         </svg>
       </button>
 
@@ -105,7 +104,6 @@
     <section id="view-metrics" class="view-section hidden">
       <h2 id="txt-title-metrics">Reporte de Ventas y Utilidades</h2>
 
-      <!-- FILTRO DE FECHAS GLASSMORPHISM -->
       <div class="glass-card" style="padding: 15px; margin-bottom: 15px;">
         <h4 style="margin-bottom: 10px; font-size: 0.95rem;" id="txt-filter-title">📅 Filtrar por Fechas</h4>
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
@@ -119,7 +117,7 @@
           </div>
           <div style="display: flex; gap: 6px; width: 100%; margin-top: 5px;">
             <button id="btn-apply-date-filter" class="btn-primary" style="flex: 1; padding: 8px; font-size: 0.85rem;">🔍 Filtrar</button>
-            <button id="btn-clear-date-filter" style="flex: 1; padding: 8px; font-size: 0.85rem; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 8px; color: inherit;" id="txt-btn-all">Ver Todo</button>
+            <button id="btn-clear-date-filter" style="flex: 1; padding: 8px; font-size: 0.85rem; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 8px; color: inherit;">Ver Todo</button>
           </div>
         </div>
       </div>
@@ -139,6 +137,22 @@
     </section>
   </main>
 
+  <!-- MODAL: SELECCIONAR IDIOMA -->
+  <div id="modal-language" class="modal hidden">
+    <div class="modal-content glass-card" style="text-align: center;">
+      <span class="close-btn" id="close-modal-lang">&times;</span>
+      <h3 id="txt-lang-modal-title" style="margin-bottom: 20px;">Seleccionar Idioma / Select Language</h3>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button id="btn-lang-es" class="btn-secondary lang-option-btn">
+          <span style="font-size: 1.3rem;">🇲🇽</span> <span>Español</span>
+        </button>
+        <button id="btn-lang-en" class="btn-secondary lang-option-btn">
+          <span style="font-size: 1.3rem;">🇺🇸</span> <span>English</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: CREAR/EDITAR ALMACÉN -->
   <div id="modal-warehouse" class="modal hidden">
     <div class="modal-content glass-card">
@@ -147,7 +161,7 @@
       <form id="form-warehouse">
         <input type="hidden" id="warehouse-id-edit">
         <input type="text" id="warehouse-name" placeholder="Nombre del Almacén" required>
-        <button type="submit" class="btn-primary full-width">Guardar</button>
+        <button type="submit" id="btn-save-warehouse" class="btn-primary full-width">Guardar</button>
       </form>
     </div>
   </div>
@@ -160,7 +174,7 @@
       <form id="form-category">
         <input type="hidden" id="cat-id-edit">
         <input type="text" id="category-name" placeholder="Nombre de Categoría" required>
-        <button type="submit" class="btn-primary full-width">Guardar</button>
+        <button type="submit" id="btn-save-category" class="btn-primary full-width">Guardar</button>
       </form>
     </div>
   </div>
@@ -181,9 +195,9 @@
           <input type="number" id="prod-stock" placeholder="Cantidad Inicial" required>
           <select id="prod-category-select" required></select>
         </div>
-        <label style="font-size: 0.8rem; opacity: 0.8;">Foto desde Galería:</label>
+        <label id="txt-label-prod-img" style="font-size: 0.8rem; opacity: 0.8;">Foto desde Galería:</label>
         <input type="file" id="prod-image-file" accept="image/*">
-        <button type="submit" class="btn-primary full-width">Guardar Producto</button>
+        <button type="submit" id="btn-save-product" class="btn-primary full-width">Guardar Producto</button>
       </form>
     </div>
   </div>
@@ -196,9 +210,9 @@
       <form id="form-store">
         <input type="hidden" id="store-id-edit">
         <input type="text" id="store-name" placeholder="Nombre de la Tienda" required>
-        <label style="font-size: 0.8rem; opacity: 0.8;">Foto desde Galería:</label>
+        <label id="txt-label-store-img" style="font-size: 0.8rem; opacity: 0.8;">Foto desde Galería:</label>
         <input type="file" id="store-image-file" accept="image/*">
-        <button type="submit" class="btn-primary full-width">Guardar Tienda</button>
+        <button type="submit" id="btn-save-store" class="btn-primary full-width">Guardar Tienda</button>
       </form>
     </div>
   </div>
@@ -221,12 +235,12 @@
   <div id="modal-transfer" class="modal hidden">
     <div class="modal-content glass-card">
       <span class="close-btn" id="close-modal-transfer">&times;</span>
-      <h3>Mover a Tienda (Check)</h3>
+      <h3 id="txt-transfer-title">Mover a Tienda (Check)</h3>
       <form id="form-transfer">
-        <label style="font-size:0.85rem;">Selecciona la Tienda Destino:</label>
+        <label id="txt-transfer-select-label" style="font-size:0.85rem;">Selecciona la Tienda Destino:</label>
         <select id="transfer-store-select" required></select>
         <input type="number" id="transfer-qty" placeholder="Cantidad a enviar" min="1" required style="margin-top: 10px;">
-        <button type="submit" class="btn-primary full-width" style="margin-top: 15px;">Confirmar Envío</button>
+        <button type="submit" id="btn-confirm-transfer" class="btn-primary full-width" style="margin-top: 15px;">Confirmar Envío</button>
       </form>
     </div>
   </div>
