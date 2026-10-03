@@ -1,11 +1,11 @@
-// ESTADO GLOBAL CON ESTRUCTURA BLINDADA
+// ESTADO GLOBAL
 let state = {
   warehouses: [],
   stores: [],
   sales: []
 };
 
-// TRADUCCIONES E IDIOMA
+// TRADUCCIONES COMPLETAS
 let currentLang = localStorage.getItem('check_lang') || 'es';
 
 const translations = {
@@ -16,10 +16,27 @@ const translations = {
     myWarehouses: "Mis Almacenes",
     myStores: "Mis Tiendas",
     salesReport: "Reporte de Ventas y Utilidades",
+    
     addWarehouse: "+ Almacén",
     addStore: "+ Tienda",
     addCategory: "+ Categoría",
     addProduct: "+ Producto",
+    backToWarehouses: "← Volver a almacenes",
+    backToStores: "← Volver a tiendas",
+    sellOne: "✓ Vender 1",
+    
+    productsInDisplay: "Productos en exhibición",
+    categoriesCount: "Categorías",
+    noWarehouses: "No tienes almacenes creados.",
+    noStores: "No tienes tiendas creadas.",
+    noCategories: "Crea una categoría primero para organizar tus productos.",
+    noProductsInCat: "Sin productos en esta categoría.",
+    noProductsInStore: "Sin productos para vender. Manda algunos desde un almacén usando la opción Check.",
+    stock: "Stock",
+    available: "Disponible",
+    stockInWarehouse: "Stock en almacén",
+    pieces: "pzas",
+    
     filterDates: "📅 Filtrar por Fechas",
     from: "Desde:",
     to: "Hasta:",
@@ -28,9 +45,50 @@ const translations = {
     totalSales: "Venta Total",
     realProfit: "Utilidad Real",
     salesHistory: "Historial de Ventas",
+    noSalesPeriod: "No hay ventas registradas en este periodo.",
+    
     addEmailTitle: "Añadir Correo",
     addEmailSub: "Ingresa tu correo para continuar.",
-    saveBtn: "Añadir"
+    saveBtn: "Añadir",
+    save: "Guardar",
+    cancel: "Cancelar",
+    
+    editProduct: "✏️ Editar Producto",
+    addStock: "➕ Añadir Stock",
+    checkSend: "✓ Check (Mandar a Tienda)",
+    deleteProduct: "🗑️ Eliminar Producto",
+    
+    createWarehouse: "Crear Almacén",
+    editWarehouse: "Editar Almacén",
+    createCategory: "Crear Categoría",
+    editCategory: "Editar Categoría",
+    createStore: "Crear Tienda",
+    editStore: "Editar Tienda",
+    createProductTitle: "Agregar Producto",
+    editProductTitle: "Editar Producto",
+    moveToStore: "Mover a Tienda (Check)",
+    selectTargetStore: "Selecciona la Tienda Destino:",
+    galleryPhoto: "Foto desde Galería:",
+    confirmShipment: "Confirmar Envío",
+    
+    phWarehouseName: "Nombre del Almacén",
+    phCategoryName: "Nombre de Categoría",
+    phStoreName: "Nombre de la Tienda",
+    phProductName: "Nombre del producto",
+    phBuyPrice: "Precio Compra ($)",
+    phSellPrice: "Precio Venta ($)",
+    phInitialStock: "Cantidad Inicial",
+    phQtyToSend: "Cantidad a enviar",
+    phEmail: "ejemplo@correo.com",
+    
+    confirmDeleteWarehouse: "¿Estás seguro de eliminar este almacén y sus productos?",
+    confirmDeleteCategory: "¿Eliminar categoría?",
+    confirmDeleteProduct: "¿Eliminar este producto?",
+    confirmDeleteStore: "¿Estás seguro de eliminar esta tienda?",
+    promptAddStock: "¿Cuántas piezas deseas añadir?",
+    alertNoStore: "Primero debes crear una tienda.",
+    alertNotEnoughStock: "No tienes suficiente stock disponible.",
+    alertSoldOut: "Producto agotado en tienda."
   },
   en: {
     warehousesTab: "Warehouses",
@@ -39,10 +97,27 @@ const translations = {
     myWarehouses: "My Warehouses",
     myStores: "My Stores",
     salesReport: "Sales & Profit Report",
+    
     addWarehouse: "+ Warehouse",
     addStore: "+ Store",
     addCategory: "+ Category",
     addProduct: "+ Product",
+    backToWarehouses: "← Back to warehouses",
+    backToStores: "← Back to stores",
+    sellOne: "✓ Sell 1",
+    
+    productsInDisplay: "Products on display",
+    categoriesCount: "Categories",
+    noWarehouses: "No warehouses created.",
+    noStores: "No stores created.",
+    noCategories: "Create a category first to organize your products.",
+    noProductsInCat: "No products in this category.",
+    noProductsInStore: "No products to sell. Send some from a warehouse using the Check option.",
+    stock: "Stock",
+    available: "Available",
+    stockInWarehouse: "Warehouse stock",
+    pieces: "pcs",
+    
     filterDates: "📅 Filter by Dates",
     from: "From:",
     to: "To:",
@@ -51,14 +126,57 @@ const translations = {
     totalSales: "Total Sales",
     realProfit: "Net Profit",
     salesHistory: "Sales History",
+    noSalesPeriod: "No sales recorded in this period.",
+    
     addEmailTitle: "Add Email",
     addEmailSub: "Enter your email to continue.",
-    saveBtn: "Add"
+    saveBtn: "Add",
+    save: "Save",
+    cancel: "Cancel",
+    
+    editProduct: "✏️ Edit Product",
+    addStock: "➕ Add Stock",
+    checkSend: "✓ Check (Send to Store)",
+    deleteProduct: "🗑️ Delete Product",
+    
+    createWarehouse: "Create Warehouse",
+    editWarehouse: "Edit Warehouse",
+    createCategory: "Create Category",
+    editCategory: "Edit Category",
+    createStore: "Create Store",
+    editStore: "Edit Store",
+    createProductTitle: "Add Product",
+    editProductTitle: "Edit Product",
+    moveToStore: "Move to Store (Check)",
+    selectTargetStore: "Select Destination Store:",
+    galleryPhoto: "Photo from Gallery:",
+    confirmShipment: "Confirm Shipment",
+    
+    phWarehouseName: "Warehouse Name",
+    phCategoryName: "Category Name",
+    phStoreName: "Store Name",
+    phProductName: "Product Name",
+    phBuyPrice: "Buy Price ($)",
+    phSellPrice: "Sell Price ($)",
+    phInitialStock: "Initial Quantity",
+    phQtyToSend: "Quantity to send",
+    phEmail: "example@email.com",
+    
+    confirmDeleteWarehouse: "Are you sure you want to delete this warehouse and its products?",
+    confirmDeleteCategory: "Delete category?",
+    confirmDeleteProduct: "Delete this product?",
+    confirmDeleteStore: "Are you sure you want to delete this store?",
+    promptAddStock: "How many pieces do you want to add?",
+    alertNoStore: "You must create a store first.",
+    alertNotEnoughStock: "You do not have enough available stock.",
+    alertSoldOut: "Product sold out in store."
   }
 };
 
 function updateLanguageUI() {
   const t = translations[currentLang];
+
+  // NAVEGACIÓN Y TÍTULOS
   document.getElementById('tab-btn-warehouses').textContent = t.warehousesTab;
   document.getElementById('tab-btn-stores').textContent = t.storesTab;
   document.getElementById('tab-btn-metrics').textContent = t.metricsTab;
@@ -69,7 +187,13 @@ function updateLanguageUI() {
 
   document.getElementById('btn-open-create-warehouse').textContent = t.addWarehouse;
   document.getElementById('btn-open-create-store').textContent = t.addStore;
+  document.getElementById('btn-open-create-category').textContent = t.addCategory;
+  document.getElementById('btn-open-create-product').textContent = t.addProduct;
 
+  document.getElementById('btn-back-to-warehouses').textContent = t.backToWarehouses;
+  document.getElementById('btn-back-to-stores').textContent = t.backToStores;
+
+  // FILTROS Y MÉTRICAS
   document.getElementById('txt-filter-title').textContent = t.filterDates;
   document.getElementById('txt-filter-from').textContent = t.from;
   document.getElementById('txt-filter-to').textContent = t.to;
@@ -80,17 +204,65 @@ function updateLanguageUI() {
   document.getElementById('txt-total-profit').textContent = t.realProfit;
   document.getElementById('txt-sales-history').textContent = t.salesHistory;
 
+  // LOGIN CORREO
   document.getElementById('txt-email-title').textContent = t.addEmailTitle;
   document.getElementById('txt-email-subtitle').textContent = t.addEmailSub;
   document.getElementById('btn-save-email').textContent = t.saveBtn;
+  document.getElementById('input-user-email').placeholder = t.phEmail;
+
+  // BOTTOM SHEET Y MODALES
+  document.getElementById('sheet-btn-edit').textContent = t.editProduct;
+  document.getElementById('sheet-btn-add-stock').textContent = t.addStock;
+  document.getElementById('sheet-btn-check').textContent = t.checkSend;
+  document.getElementById('sheet-btn-delete').textContent = t.deleteProduct;
+  document.getElementById('close-sheet').textContent = t.cancel;
+
+  document.getElementById('txt-transfer-title').textContent = t.moveToStore;
+  document.getElementById('txt-transfer-select-label').textContent = t.selectTargetStore;
+  document.getElementById('btn-confirm-transfer').textContent = t.confirmShipment;
+  document.getElementById('transfer-qty').placeholder = t.phQtyToSend;
+
+  document.getElementById('txt-label-prod-img').textContent = t.galleryPhoto;
+  document.getElementById('txt-label-store-img').textContent = t.galleryPhoto;
+
+  document.getElementById('btn-save-warehouse').textContent = t.save;
+  document.getElementById('btn-save-category').textContent = t.save;
+  document.getElementById('btn-save-product').textContent = t.save;
+  document.getElementById('btn-save-store').textContent = t.save;
+
+  document.getElementById('warehouse-name').placeholder = t.phWarehouseName;
+  document.getElementById('category-name').placeholder = t.phCategoryName;
+  document.getElementById('store-name').placeholder = t.phStoreName;
+  document.getElementById('prod-name').placeholder = t.phProductName;
+  document.getElementById('prod-buy-price').placeholder = t.phBuyPrice;
+  document.getElementById('prod-sell-price').placeholder = t.phSellPrice;
+  document.getElementById('prod-stock').placeholder = t.phInitialStock;
 }
 
-// TOGGLE IDIOMA
+// CONTROL DE SELECCIÓN DE IDIOMA CON MODAL
 document.getElementById('btn-lang-toggle').onclick = () => {
-  currentLang = currentLang === 'es' ? 'en' : 'es';
-  localStorage.setItem('check_lang', currentLang);
-  updateLanguageUI();
+  document.getElementById('modal-language').classList.remove('hidden');
 };
+document.getElementById('close-modal-lang').onclick = () => {
+  document.getElementById('modal-language').classList.add('hidden');
+};
+
+document.getElementById('btn-lang-es').onclick = () => setLanguage('es');
+document.getElementById('btn-lang-en').onclick = () => setLanguage('en');
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('check_lang', currentLang);
+  document.getElementById('modal-language').classList.add('hidden');
+  updateLanguageUI();
+  
+  // Re-renderizar la vista activa inmediatamente
+  if (!document.getElementById('view-warehouses').classList.contains('hidden')) renderWarehouses();
+  if (!document.getElementById('view-warehouse-detail').classList.contains('hidden')) renderWarehouseProducts();
+  if (!document.getElementById('view-stores').classList.contains('hidden')) renderStores();
+  if (!document.getElementById('view-store-detail').classList.contains('hidden')) renderStoreProducts();
+  if (!document.getElementById('view-metrics').classList.contains('hidden')) renderMetrics();
+}
 
 // COMPROBACIÓN DEL CORREO AL INICIAR
 function checkUserEmail() {
@@ -109,10 +281,8 @@ document.getElementById('form-email-setup').onsubmit = function(e) {
   const email = document.getElementById('input-user-email').value.trim().toLowerCase();
 
   if (email) {
-    // 1. Guardar en localStorage
     localStorage.setItem('check_user_email', email);
 
-    // 2. Si Firebase Firestore está conectado en la app, registra el documento
     if (window.db && window.setDoc && window.doc) {
       window.setDoc(window.doc(window.db, "user_keys", email), {
         email: email,
@@ -143,7 +313,6 @@ function initDB() {
   });
 }
 
-// CARGAR DATOS DESDE INDEXEDDB
 async function loadState() {
   await initDB();
   return new Promise((resolve) => {
@@ -165,7 +334,6 @@ async function loadState() {
   });
 }
 
-// GUARDADO AUTOMÁTICO INMEDIATO
 function saveState() {
   if (!db) return;
   try {
@@ -177,7 +345,6 @@ function saveState() {
   }
 }
 
-// PROCESS IMAGE BASE64
 function processImage(file) {
   return new Promise((resolve) => {
     if (!file) return resolve(null);
@@ -249,9 +416,10 @@ let activeProductId = null;
 
 // GESTIÓN DE ALMACENES
 function renderWarehouses() {
+  const t = translations[currentLang];
   const container = document.getElementById('warehouses-grid');
   container.innerHTML = state.warehouses.length === 0
-    ? `<p style="grid-column: span 2; opacity:0.6;">No tienes almacenes creados.</p>`
+    ? `<p style="grid-column: span 2; opacity:0.6;">${t.noWarehouses}</p>`
     : state.warehouses.map(w => `
         <div class="item-card glass-card" onclick="openWarehouse('${w.id}')">
           <div class="card-top-actions">
@@ -260,7 +428,7 @@ function renderWarehouses() {
           </div>
           <div style="font-size:2.2rem; text-align:center; margin: 12px 0;">📦</div>
           <h4>${w.name}</h4>
-          <span class="subtext">${(w.categories || []).length} Categorías</span>
+          <span class="subtext">${(w.categories || []).length} ${t.categoriesCount}</span>
         </div>
       `).join('');
 }
@@ -279,15 +447,17 @@ function openWarehouse(id) {
 }
 
 window.editWarehouse = function(id) {
+  const t = translations[currentLang];
   const w = state.warehouses.find(item => item.id === id);
-  document.getElementById('modal-warehouse-title').textContent = "Editar Almacén";
+  document.getElementById('modal-warehouse-title').textContent = t.editWarehouse;
   document.getElementById('warehouse-id-edit').value = w.id;
   document.getElementById('warehouse-name').value = w.name;
   document.getElementById('modal-warehouse').classList.remove('hidden');
 };
 
 window.deleteWarehouse = function(id) {
-  if (confirm("¿Estás seguro de eliminar este almacén y sus productos?")) {
+  const t = translations[currentLang];
+  if (confirm(t.confirmDeleteWarehouse)) {
     state.warehouses = state.warehouses.filter(w => w.id !== id);
     saveState();
     renderWarehouses();
@@ -302,12 +472,13 @@ document.getElementById('btn-back-to-warehouses').onclick = () => {
 
 // CATEGORÍAS Y PRODUCTOS EN ALMACÉN
 function renderWarehouseProducts() {
+  const t = translations[currentLang];
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   const container = document.getElementById('categories-products-container');
   container.innerHTML = "";
 
   if (!w || !w.categories || w.categories.length === 0) {
-    container.innerHTML = `<p style="opacity:0.6;">Crea una categoría primero para organizar tus productos.</p>`;
+    container.innerHTML = `<p style="opacity:0.6;">${t.noCategories}</p>`;
     return;
   }
 
@@ -319,21 +490,21 @@ function renderWarehouseProducts() {
           <h3>${cat.name}</h3>
           <div class="category-actions">
             <button class="btn-icon-action" onclick="editCategory('${cat.id}', '${cat.name}')">✏️</button>
-            <button class="btn-icon-action" onclick="deleteCategory('${cat.id}')">🗑️️</button>
+            <button class="btn-icon-action" onclick="deleteCategory('${cat.id}')">🗑</button>
           </div>
         </div>
         <div class="cards-grid">
     `;
 
     if (products.length === 0) {
-      catHTML += `<p style="opacity:0.5; font-size:0.8rem; grid-column: span 2;">Sin productos en esta categoría.</p>`;
+      catHTML += `<p style="opacity:0.5; font-size:0.8rem; grid-column: span 2;">${t.noProductsInCat}</p>`;
     } else {
       products.forEach(p => {
         catHTML += `
           <div class="item-card glass-card" onclick="openProductSheet('${p.id}')">
             <img src="${p.image || 'https://via.placeholder.com/100?text=Sin+Foto'}">
             <h4>${p.name}</h4>
-            <span class="subtext">Stock: <strong>${p.stock}</strong></span>
+            <span class="subtext">${t.stock}: <strong>${p.stock}</strong></span>
             <span class="subtext" style="color:#22c55e; font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
           </div>
         `;
@@ -345,14 +516,16 @@ function renderWarehouseProducts() {
 }
 
 window.editCategory = function(catId, catName) {
-  document.getElementById('modal-category-title').textContent = "Editar Categoría";
+  const t = translations[currentLang];
+  document.getElementById('modal-category-title').textContent = t.editCategory;
   document.getElementById('cat-id-edit').value = catId;
   document.getElementById('category-name').value = catName;
   document.getElementById('modal-category').classList.remove('hidden');
 };
 
 window.deleteCategory = function(catId) {
-  if (confirm("¿Eliminar categoría?")) {
+  const t = translations[currentLang];
+  if (confirm(t.confirmDeleteCategory)) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
     w.categories = w.categories.filter(c => c.id !== catId);
     saveState();
@@ -364,13 +537,14 @@ window.deleteCategory = function(catId) {
 const sheet = document.getElementById('bottom-sheet');
 
 function openProductSheet(prodId) {
+  const t = translations[currentLang];
   activeProductId = prodId;
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   const p = w.products.find(item => item.id === prodId);
 
   document.getElementById('sheet-prod-info').innerHTML = `
     <h3 style="margin-bottom:4px;">${p.name}</h3>
-    <p style="font-size:0.85rem; opacity:0.8;">Stock en almacén: <strong>${p.stock} pzas</strong></p>
+    <p style="font-size:0.85rem; opacity:0.8;">${t.stockInWarehouse}: <strong>${p.stock} ${t.pieces}</strong></p>
   `;
   sheet.classList.remove('hidden');
 }
@@ -378,11 +552,12 @@ function openProductSheet(prodId) {
 document.getElementById('close-sheet').onclick = () => sheet.classList.add('hidden');
 
 document.getElementById('sheet-btn-edit').onclick = () => {
+  const t = translations[currentLang];
   sheet.classList.add('hidden');
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   const p = w.products.find(item => item.id === activeProductId);
 
-  document.getElementById('modal-product-title').textContent = "Editar Producto";
+  document.getElementById('modal-product-title').textContent = t.editProductTitle;
   document.getElementById('prod-id-edit').value = p.id;
   document.getElementById('prod-name').value = p.name;
   document.getElementById('prod-buy-price').value = p.buyPrice;
@@ -397,8 +572,9 @@ document.getElementById('sheet-btn-edit').onclick = () => {
 };
 
 document.getElementById('sheet-btn-delete').onclick = () => {
+  const t = translations[currentLang];
   sheet.classList.add('hidden');
-  if (confirm("¿Eliminar este producto?")) {
+  if (confirm(t.confirmDeleteProduct)) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
     w.products = w.products.filter(p => p.id !== activeProductId);
     saveState();
@@ -407,8 +583,9 @@ document.getElementById('sheet-btn-delete').onclick = () => {
 };
 
 document.getElementById('sheet-btn-add-stock').onclick = () => {
+  const t = translations[currentLang];
   sheet.classList.add('hidden');
-  const addQty = prompt("¿Cuántas piezas deseas añadir?");
+  const addQty = prompt(t.promptAddStock);
   if (addQty && !isNaN(addQty) && parseInt(addQty) > 0) {
     const w = state.warehouses.find(item => item.id === activeWarehouseId);
     const p = w.products.find(item => item.id === activeProductId);
@@ -420,9 +597,10 @@ document.getElementById('sheet-btn-add-stock').onclick = () => {
 
 // MODAL CHECK: ENVIAR PRODUCTO A TIENDA
 document.getElementById('sheet-btn-check').onclick = () => {
+  const t = translations[currentLang];
   sheet.classList.add('hidden');
   if (state.stores.length === 0) {
-    alert("Primero debes crear una tienda.");
+    alert(t.alertNoStore);
     return;
   }
   const storeSelect = document.getElementById('transfer-store-select');
@@ -432,6 +610,7 @@ document.getElementById('sheet-btn-check').onclick = () => {
 
 document.getElementById('form-transfer').onsubmit = (e) => {
   e.preventDefault();
+  const t = translations[currentLang];
   const targetStoreId = document.getElementById('transfer-store-select').value;
   const qty = parseInt(document.getElementById('transfer-qty').value);
 
@@ -439,7 +618,7 @@ document.getElementById('form-transfer').onsubmit = (e) => {
   const p = w.products.find(item => item.id === activeProductId);
 
   if (qty > p.stock) {
-    alert("No tienes suficiente stock disponible.");
+    alert(t.alertNotEnoughStock);
     return;
   }
 
@@ -461,20 +640,21 @@ document.getElementById('form-transfer').onsubmit = (e) => {
   renderWarehouseProducts();
 };
 
-// TIENDAS Y VENTAS EN TIEMPO REAL
+// TIENDAS Y VENTAS
 function renderStores() {
+  const t = translations[currentLang];
   const container = document.getElementById('stores-grid');
   container.innerHTML = state.stores.length === 0
-    ? `<p style="grid-column: span 2; opacity:0.6;">No tienes tiendas creadas.</p>`
+    ? `<p style="grid-column: span 2; opacity:0.6;">${t.noStores}</p>`
     : state.stores.map(s => `
         <div class="item-card glass-card" onclick="openStore('${s.id}')">
           <div class="card-top-actions">
-            <button class="btn-mini-action" onclick="event.stopPropagation(); editStore('${s.id}')">✏️️</button>
+            <button class="btn-mini-action" onclick="event.stopPropagation(); editStore('${s.id}')">✏️</button>
             <button class="btn-mini-action" onclick="event.stopPropagation(); deleteStore('${s.id}')">🗑️</button>
           </div>
           <img src="${s.image || 'https://via.placeholder.com/100?text=Tienda'}">
           <h4>${s.name}</h4>
-          <span class="subtext">${(s.products || []).length} Productos en exhibición</span>
+          <span class="subtext">${(s.products || []).length} ${t.productsInDisplay}</span>
         </div>
       `).join('');
 }
@@ -492,15 +672,17 @@ function openStore(id) {
 }
 
 window.editStore = function(id) {
+  const t = translations[currentLang];
   const s = state.stores.find(item => item.id === id);
-  document.getElementById('modal-store-title').textContent = "Editar Tienda";
+  document.getElementById('modal-store-title').textContent = t.editStore;
   document.getElementById('store-id-edit').value = s.id;
   document.getElementById('store-name').value = s.name;
   document.getElementById('modal-store').classList.remove('hidden');
 };
 
 window.deleteStore = function(id) {
-  if (confirm("¿Estás seguro de eliminar esta tienda?")) {
+  const t = translations[currentLang];
+  if (confirm(t.confirmDeleteStore)) {
     state.stores = state.stores.filter(s => s.id !== id);
     saveState();
     renderStores();
@@ -514,12 +696,13 @@ document.getElementById('btn-back-to-stores').onclick = () => {
 };
 
 function renderStoreProducts() {
+  const t = translations[currentLang];
   const store = state.stores.find(s => s.id === activeStoreId);
   const container = document.getElementById('store-products-container');
   container.innerHTML = "";
 
   if (!store || !store.products || store.products.length === 0) {
-    container.innerHTML = `<p style="opacity:0.6; grid-column: span 2;">Sin productos para vender. Manda algunos desde un almacén usando la opción Check.</p>`;
+    container.innerHTML = `<p style="opacity:0.6; grid-column: span 2;">${t.noProductsInStore}</p>`;
     return;
   }
 
@@ -528,10 +711,10 @@ function renderStoreProducts() {
       <div class="item-card glass-card">
         <img src="${p.image || 'https://via.placeholder.com/100?text=Sin+Foto'}">
         <h4>${p.name}</h4>
-        <span class="subtext">Disponible: <strong>${p.stock}</strong></span>
+        <span class="subtext">${t.available}: <strong>${p.stock}</strong></span>
         <span class="subtext" style="color:#22c55e; font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
         <button class="btn-primary" onclick="sellProduct('${p.id}')" style="margin-top:8px; font-size:0.8rem;">
-          ✓ Vender 1
+          ${t.sellOne}
         </button>
       </div>
     `;
@@ -540,10 +723,11 @@ function renderStoreProducts() {
 
 // REGISTRAR VENTA
 window.sellProduct = function(prodId) {
+  const t = translations[currentLang];
   const store = state.stores.find(s => s.id === activeStoreId);
   const p = store.products.find(item => item.id === prodId);
 
-  if (!p || p.stock <= 0) return alert("Producto agotado en tienda.");
+  if (!p || p.stock <= 0) return alert(t.alertSoldOut);
 
   p.stock -= 1;
   const profit = parseFloat(p.sellPrice) - parseFloat(p.buyPrice);
@@ -565,6 +749,7 @@ window.sellProduct = function(prodId) {
 
 // REPORTES Y UTILIDADES
 function renderMetrics() {
+  const t = translations[currentLang];
   const startDate = document.getElementById('filter-date-start')?.value;
   const endDate = document.getElementById('filter-date-end')?.value;
 
@@ -592,7 +777,7 @@ function renderMetrics() {
 
   const historyList = document.getElementById('sales-history-list');
   historyList.innerHTML = filteredSales.length === 0
-    ? `<p style="opacity:0.6; margin-top:10px;">No hay ventas registradas en este periodo.</p>`
+    ? `<p style="opacity:0.6; margin-top:10px;">${t.noSalesPeriod}</p>`
     : filteredSales.slice().reverse().map(s => `
         <div style="background:var(--glass-bg); border:1px solid var(--glass-border); padding:12px; border-radius:12px; margin-top:8px; display:flex; justify-content:space-between; backdrop-filter:blur(8px);">
           <div>
@@ -615,9 +800,10 @@ document.getElementById('btn-clear-date-filter').onclick = () => {
   renderMetrics();
 };
 
-// EVENTOS DE CREACIÓN DE MODALES
+// EVENTOS DE MODALES
 document.getElementById('btn-open-create-warehouse').onclick = () => {
-  document.getElementById('modal-warehouse-title').textContent = "Crear Almacén";
+  const t = translations[currentLang];
+  document.getElementById('modal-warehouse-title').textContent = t.createWarehouse;
   document.getElementById('warehouse-id-edit').value = "";
   document.getElementById('form-warehouse').reset();
   document.getElementById('modal-warehouse').classList.remove('hidden');
@@ -643,7 +829,8 @@ document.getElementById('form-warehouse').onsubmit = (e) => {
 };
 
 document.getElementById('btn-open-create-category').onclick = () => {
-  document.getElementById('modal-category-title').textContent = "Crear Categoría";
+  const t = translations[currentLang];
+  document.getElementById('modal-category-title').textContent = t.createCategory;
   document.getElementById('cat-id-edit').value = "";
   document.getElementById('form-category').reset();
   document.getElementById('modal-category').classList.remove('hidden');
@@ -670,12 +857,13 @@ document.getElementById('form-category').onsubmit = (e) => {
 };
 
 document.getElementById('btn-open-create-product').onclick = () => {
+  const t = translations[currentLang];
   const w = state.warehouses.find(item => item.id === activeWarehouseId);
   if (!w.categories || w.categories.length === 0) {
-    alert("Debes crear al menos una categoría primero.");
+    alert(t.noCategories);
     return;
   }
-  document.getElementById('modal-product-title').textContent = "Agregar Producto";
+  document.getElementById('modal-product-title').textContent = t.createProductTitle;
   document.getElementById('prod-id-edit').value = "";
   document.getElementById('form-product').reset();
 
@@ -722,7 +910,8 @@ document.getElementById('form-product').onsubmit = function(e) {
 };
 
 document.getElementById('btn-open-create-store').onclick = () => {
-  document.getElementById('modal-store-title').textContent = "Crear Tienda";
+  const t = translations[currentLang];
+  document.getElementById('modal-store-title').textContent = t.createStore;
   document.getElementById('store-id-edit').value = "";
   document.getElementById('form-store').reset();
   document.getElementById('modal-store').classList.remove('hidden');
