@@ -17,6 +17,7 @@ body.light-theme {
   --secondary-bg: rgba(0, 0, 0, 0.05);
 }
 
+/* REINICIO GLOBAL CORREGIDO CON ASTERISCO (*) */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -409,6 +410,7 @@ input, select {
 
 .full-width { width: 100%; }
 .hidden { display: none !important; }
+
 /* ESTILOS PARA OPCIONES DE IDIOMA */
 .lang-option-btn {
   display: flex;
