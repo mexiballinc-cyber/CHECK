@@ -5,174 +5,6 @@ let state = {
   sales: []
 };
 
-// TRADUCCIONES COMPLETAS
-let currentLang = localStorage.getItem('check_lang') || 'es';
-
-const translations = {
-  es: {
-    warehousesTab: "Almacenes",
-    storesTab: "Tiendas",
-    metricsTab: "Utilidades",
-    myWarehouses: "Mis Almacenes",
-    myStores: "Mis Tiendas",
-    salesReport: "Reporte de Ventas y Utilidades",
-    
-    addWarehouse: "+ Almacén",
-    addStore: "+ Tienda",
-    addCategory: "+ Categoría",
-    addProduct: "+ Producto",
-    backToWarehouses: "← Volver a almacenes",
-    backToStores: "← Volver a tiendas",
-    sellOne: "✓ Vender 1",
-    
-    productsInDisplay: "Productos en exhibición",
-    categoriesCount: "Categorías",
-    noWarehouses: "No tienes almacenes creados.",
-    noStores: "No tienes tiendas creadas.",
-    noCategories: "Crea una categoría primero para organizar tus productos.",
-    noProductsInCat: "Sin productos en esta categoría.",
-    noProductsInStore: "Sin productos para vender. Manda algunos desde un almacén usando la opción Check.",
-    stock: "Stock",
-    available: "Disponible",
-    stockInWarehouse: "Stock en almacén",
-    pieces: "pzas",
-    
-    filterDates: "📅 Filtrar por Fechas",
-    from: "Desde:",
-    to: "Hasta:",
-    filterBtn: "🔍 Filtrar",
-    seeAll: "Ver Todo",
-    totalSales: "Venta Total",
-    realProfit: "Utilidad Real",
-    salesHistory: "Historial de Ventas",
-    noSalesPeriod: "No hay ventas registradas en este periodo.",
-    
-    addEmailTitle: "Añadir Correo",
-    addEmailSub: "Ingresa tu correo para continuar.",
-    saveBtn: "Añadir",
-    save: "Guardar",
-    cancel: "Cancelar",
-    
-    editProduct: "✏️ Editar Producto",
-    addStock: "➕ Añadir Stock",
-    checkSend: "✓ Check (Mandar a Tienda)",
-    deleteProduct: "🗑️ Eliminar Producto",
-    
-    createWarehouse: "Crear Almacén",
-    editWarehouse: "Editar Almacén",
-    createCategory: "Crear Categoría",
-    editCategory: "Editar Categoría",
-    createStore: "Crear Tienda",
-    editStore: "Editar Tienda",
-    createProductTitle: "Agregar Producto",
-    editProductTitle: "Editar Producto",
-    moveToStore: "Mover a Tienda (Check)",
-    selectTargetStore: "Selecciona la Tienda Destino:",
-    galleryPhoto: "Foto desde Galería:",
-    confirmShipment: "Confirmar Envío",
-    
-    phWarehouseName: "Nombre del Almacén",
-    phCategoryName: "Nombre de Categoría",
-    phStoreName: "Nombre de la Tienda",
-    phProductName: "Nombre del producto",
-    phBuyPrice: "Precio Compra ($)",
-    phSellPrice: "Precio Venta ($)",
-    phInitialStock: "Cantidad Inicial",
-    phQtyToSend: "Cantidad a enviar",
-    phEmail: "ejemplo@correo.com",
-    
-    confirmDeleteWarehouse: "¿Estás seguro de eliminar este almacén y sus productos?",
-    confirmDeleteCategory: "¿Eliminar categoría?",
-    confirmDeleteProduct: "¿Eliminar este producto?",
-    confirmDeleteStore: "¿Estás seguro de eliminar esta tienda?",
-    promptAddStock: "¿Cuántas piezas deseas añadir?",
-    alertNoStore: "Primero debes crear una tienda.",
-    alertNotEnoughStock: "No tienes suficiente stock disponible.",
-    alertSoldOut: "Producto agotado en tienda."
-  },
-  en: {
-    warehousesTab: "Warehouses",
-    storesTab: "Stores",
-    metricsTab: "Metrics",
-    myWarehouses: "My Warehouses",
-    myStores: "My Stores",
-    salesReport: "Sales & Profit Report",
-    
-    addWarehouse: "+ Warehouse",
-    addStore: "+ Store",
-    addCategory: "+ Category",
-    addProduct: "+ Product",
-    backToWarehouses: "← Back to warehouses",
-    backToStores: "← Back to stores",
-    sellOne: "✓ Sell 1",
-    
-    productsInDisplay: "Products on display",
-    categoriesCount: "Categories",
-    noWarehouses: "No warehouses created.",
-    noStores: "No stores created.",
-    noCategories: "Create a category first to organize your products.",
-    noProductsInCat: "No products in this category.",
-    noProductsInStore: "No products to sell. Send some from a warehouse using the Check option.",
-    stock: "Stock",
-    available: "Available",
-    stockInWarehouse: "Warehouse stock",
-    pieces: "pcs",
-    
-    filterDates: "📅 Filter by Dates",
-    from: "From:",
-    to: "To:",
-    filterBtn: "🔍 Filter",
-    seeAll: "View All",
-    totalSales: "Total Sales",
-    realProfit: "Net Profit",
-    salesHistory: "Sales History",
-    noSalesPeriod: "No sales recorded in this period.",
-    
-    addEmailTitle: "Add Email",
-    addEmailSub: "Enter your email to continue.",
-    saveBtn: "Add",
-    save: "Save",
-    cancel: "Cancel",
-    
-    editProduct: "✏️ Edit Product",
-    addStock: "➕ Add Stock",
-    checkSend: "✓ Check (Send to Store)",
-    deleteProduct: "🗑️ Delete Product",
-    
-    createWarehouse: "Create Warehouse",
-    editWarehouse: "Edit Warehouse",
-    createCategory: "Create Category",
-    editCategory: "Edit Category",
-    createStore: "Create Store",
-    editStore: "Edit Store",
-    createProductTitle: "Add Product",
-    editProductTitle: "Edit Product",
-    moveToStore: "Move to Store (Check)",
-    selectTargetStore: "Select Destination Store:",
-    galleryPhoto: "Photo from Gallery:",
-    confirmShipment: "Confirm Shipment",
-    
-    phWarehouseName: "Warehouse Name",
-    phCategoryName: "Category Name",
-    phStoreName: "Store Name",
-    phProductName: "Product Name",
-    phBuyPrice: "Buy Price ($)",
-    phSellPrice: "Sell Price ($)",
-    phInitialStock: "Initial Quantity",
-    phQtyToSend: "Quantity to send",
-    phEmail: "example@email.com",
-    
-    confirmDeleteWarehouse: "Are you sure you want to delete this warehouse and its products?",
-    confirmDeleteCategory: "Delete category?",
-    confirmDeleteProduct: "Delete this product?",
-    confirmDeleteStore: "Are you sure you want to delete this store?",
-    promptAddStock: "How many pieces do you want to add?",
-    alertNoStore: "You must create a store first.",
-    alertNotEnoughStock: "You do not have enough available stock.",
-    alertSoldOut: "Product sold out in store."
-  }
-};
-
 function updateLanguageUI() {
   const t = translations[currentLang];
 
@@ -239,7 +71,7 @@ function updateLanguageUI() {
   document.getElementById('prod-stock').placeholder = t.phInitialStock;
 }
 
-// CONTROL DE SELECCIÓN DE IDIOMA CON MODAL
+// CONTROL DE CAMBIO DE IDIOMA
 document.getElementById('btn-lang-toggle').onclick = () => {
   document.getElementById('modal-language').classList.remove('hidden');
 };
@@ -255,8 +87,7 @@ function setLanguage(lang) {
   localStorage.setItem('check_lang', currentLang);
   document.getElementById('modal-language').classList.add('hidden');
   updateLanguageUI();
-  
-  // Re-renderizar la vista activa inmediatamente
+
   if (!document.getElementById('view-warehouses').classList.contains('hidden')) renderWarehouses();
   if (!document.getElementById('view-warehouse-detail').classList.contains('hidden')) renderWarehouseProducts();
   if (!document.getElementById('view-stores').classList.contains('hidden')) renderStores();
@@ -264,7 +95,7 @@ function setLanguage(lang) {
   if (!document.getElementById('view-metrics').classList.contains('hidden')) renderMetrics();
 }
 
-// COMPROBACIÓN DEL CORREO AL INICIAR
+// COMPROBACIÓN DEL CORREO Y FIRESTORE
 function checkUserEmail() {
   const savedEmail = localStorage.getItem('check_user_email');
   const screen = document.getElementById('email-setup-screen');
@@ -294,7 +125,7 @@ document.getElementById('form-email-setup').onsubmit = function(e) {
   }
 };
 
-// BASE DE DATOS INDEXEDDB
+// INDEXEDDB
 let db;
 function initDB() {
   return new Promise((resolve, reject) => {
@@ -502,7 +333,7 @@ function renderWarehouseProducts() {
       products.forEach(p => {
         catHTML += `
           <div class="item-card glass-card" onclick="openProductSheet('${p.id}')">
-            <img src="${p.image || 'https://via.placeholder.com/100?text=Sin+Foto'}">
+            <img src="${p.image || 'https://via.placeholder.com/100?text=No+Photo'}">
             <h4>${p.name}</h4>
             <span class="subtext">${t.stock}: <strong>${p.stock}</strong></span>
             <span class="subtext" style="color:#22c55e; font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
@@ -652,7 +483,7 @@ function renderStores() {
             <button class="btn-mini-action" onclick="event.stopPropagation(); editStore('${s.id}')">✏️</button>
             <button class="btn-mini-action" onclick="event.stopPropagation(); deleteStore('${s.id}')">🗑️</button>
           </div>
-          <img src="${s.image || 'https://via.placeholder.com/100?text=Tienda'}">
+          <img src="${s.image || 'https://via.placeholder.com/100?text=Store'}">
           <h4>${s.name}</h4>
           <span class="subtext">${(s.products || []).length} ${t.productsInDisplay}</span>
         </div>
@@ -709,7 +540,7 @@ function renderStoreProducts() {
   store.products.forEach(p => {
     container.innerHTML += `
       <div class="item-card glass-card">
-        <img src="${p.image || 'https://via.placeholder.com/100?text=Sin+Foto'}">
+        <img src="${p.image || 'https://via.placeholder.com/100?text=No+Photo'}">
         <h4>${p.name}</h4>
         <span class="subtext">${t.available}: <strong>${p.stock}</strong></span>
         <span class="subtext" style="color:#22c55e; font-weight:bold;">$${parseFloat(p.sellPrice).toFixed(2)}</span>
@@ -955,7 +786,7 @@ document.getElementById('btn-theme-toggle').onclick = () => {
   document.getElementById('app-logo').src = isLight ? "https://i.imgur.com/UEvIK9K.png" : "https://i.imgur.com/qdIS9iU.png";
 };
 
-// INICIALIZACIÓN
+// INICIALIZACIÓN DE APLICACIÓN
 loadState().then(() => {
   checkUserEmail();
   updateLanguageUI();
