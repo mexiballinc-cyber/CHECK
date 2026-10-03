@@ -409,3 +409,22 @@ input, select {
 
 .full-width { width: 100%; }
 .hidden { display: none !important; }
+/* ESTILOS PARA OPCIONES DE IDIOMA */
+.lang-option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  font-size: 1rem;
+  width: 100%;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.lang-option-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.lang-option-btn:active {
+  transform: scale(0.98);
+}
