@@ -245,7 +245,34 @@
     </div>
   </div>
 
+  <!-- Carga de Firebase App y Firestore desde CDN CDN CDN CDN -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+
+    // Configuración oficial de tu proyecto Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzLQxxCr90B3p1Jrm_BRLVC1y9zXw4pHg",
+      authDomain: "check-d662e.firebaseapp.com",
+      projectId: "check-d662e",
+      storageBucket: "check-d662e.firebasestorage.app",
+      messagingSenderId: "1018057230035",
+      appId: "1:1018057230035:web:ad7677ad4ee22006493626"
+    };
+
+    // Inicialización de Firebase y Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Exponer la base de datos y métodos al ámbito global de JavaScript
+    window.db = db;
+    window.setDoc = setDoc;
+    window.doc = doc;
+  </script>
+
+  <!-- Tus scripts locales -->
   <script src="app.js"></script>
   <script src="backup.js"></script>
 </body>
 </html>
+
