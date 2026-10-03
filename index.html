@@ -10,18 +10,45 @@
 </head>
 <body class="dark-theme">
 
+  <!-- PANTALLA INICIAL: VINCULAR CORREO (Se oculta si ya existe en localStorage) -->
+  <div id="email-setup-screen" class="email-screen hidden">
+    <div class="glass-card email-card">
+      <img src="https://i.imgur.com/xC7fUhQ.png" alt="Check Logo" class="email-logo">
+      <h2 id="txt-email-title">Añadir Correo</h2>
+      <p id="txt-email-subtitle" class="subtext">Ingresa tu correo para continuar.</p>
+      
+      <form id="form-email-setup">
+        <input type="email" id="input-user-email" placeholder="ejemplo@correo.com" required>
+        <button type="submit" id="btn-save-email" class="btn-primary full-width">Añadir</button>
+      </form>
+    </div>
+  </div>
+
   <!-- NAVBAR GLASSMORPHISM -->
   <header class="navbar">
     <div class="brand">
       <img id="app-logo" src="https://i.imgur.com/qdIS9iU.png" alt="Check Logo">
       <span>Check</span>
     </div>
-    <button id="btn-theme-toggle" class="icon-btn" title="Cambiar Tema">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"></circle>
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-      </svg>
-    </button>
+    <div class="navbar-actions">
+      <!-- BOTÓN DE IDIOMAS (Icono 🗣️ SVG) -->
+      <button id="btn-lang-toggle" class="icon-btn" title="Cambiar Idioma">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13"></path>
+          <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+          <circle cx="9" cy="18" r="3"></circle>
+          <path d="M18 11a5 5 0 0 0-5-5"></path>
+        </svg>
+      </button>
+
+      <!-- BOTÓN TEMA OSCURO / CLARO -->
+      <button id="btn-theme-toggle" class="icon-btn" title="Cambiar Tema">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <!-- NAVEGACIÓN PRINCIPAL (TABS) -->
@@ -37,7 +64,7 @@
     <!-- VISTA: ALMACENES -->
     <section id="view-warehouses" class="view-section">
       <div class="section-header">
-        <h2>Mis Almacenes</h2>
+        <h2 id="txt-title-warehouses">Mis Almacenes</h2>
         <button id="btn-open-create-warehouse" class="btn-primary">+ Almacén</button>
       </div>
       <div id="warehouses-grid" class="cards-grid"></div>
@@ -59,7 +86,7 @@
     <!-- VISTA: TIENDAS -->
     <section id="view-stores" class="view-section hidden">
       <div class="section-header">
-        <h2>Mis Tiendas</h2>
+        <h2 id="txt-title-stores">Mis Tiendas</h2>
         <button id="btn-open-create-store" class="btn-primary">+ Tienda</button>
       </div>
       <div id="stores-grid" class="cards-grid"></div>
@@ -76,38 +103,38 @@
 
     <!-- VISTA: UTILIDADES Y VENTAS -->
     <section id="view-metrics" class="view-section hidden">
-      <h2>Reporte de Ventas y Utilidades</h2>
+      <h2 id="txt-title-metrics">Reporte de Ventas y Utilidades</h2>
 
       <!-- FILTRO DE FECHAS GLASSMORPHISM -->
       <div class="glass-card" style="padding: 15px; margin-bottom: 15px;">
-        <h4 style="margin-bottom: 10px; font-size: 0.95rem;">📅 Filtrar por Fechas</h4>
+        <h4 style="margin-bottom: 10px; font-size: 0.95rem;" id="txt-filter-title">📅 Filtrar por Fechas</h4>
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
           <div style="flex: 1; min-width: 120px;">
-            <label style="font-size: 0.75rem; opacity: 0.8; display: block; margin-bottom: 4px;">Desde:</label>
+            <label style="font-size: 0.75rem; opacity: 0.8; display: block; margin-bottom: 4px;" id="txt-filter-from">Desde:</label>
             <input type="date" id="filter-date-start" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: inherit;">
           </div>
           <div style="flex: 1; min-width: 120px;">
-            <label style="font-size: 0.75rem; opacity: 0.8; display: block; margin-bottom: 4px;">Hasta:</label>
+            <label style="font-size: 0.75rem; opacity: 0.8; display: block; margin-bottom: 4px;" id="txt-filter-to">Hasta:</label>
             <input type="date" id="filter-date-end" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: inherit;">
           </div>
           <div style="display: flex; gap: 6px; width: 100%; margin-top: 5px;">
             <button id="btn-apply-date-filter" class="btn-primary" style="flex: 1; padding: 8px; font-size: 0.85rem;">🔍 Filtrar</button>
-            <button id="btn-clear-date-filter" style="flex: 1; padding: 8px; font-size: 0.85rem; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 8px; color: inherit;">Ver Todo</button>
+            <button id="btn-clear-date-filter" style="flex: 1; padding: 8px; font-size: 0.85rem; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 8px; color: inherit;" id="txt-btn-all">Ver Todo</button>
           </div>
         </div>
       </div>
 
       <div class="metrics-cards">
         <div class="metric-card">
-          <span>Venta Total</span>
+          <span id="txt-total-sales">Venta Total</span>
           <h3 id="metric-total-sales">$0.00</h3>
         </div>
         <div class="metric-card highlight">
-          <span>Utilidad Real</span>
+          <span id="txt-total-profit">Utilidad Real</span>
           <h3 id="metric-total-profit">$0.00</h3>
         </div>
       </div>
-      <h3>Historial de Ventas</h3>
+      <h3 id="txt-sales-history">Historial de Ventas</h3>
       <div id="sales-history-list"></div>
     </section>
   </main>
@@ -203,10 +230,8 @@
       </form>
     </div>
   </div>
-<!-- Tus scripts anteriores -->
+
   <script src="app.js"></script>
-  
-  <!-- SCRIPT NUEVO DE IMPORTAR/EXPORTAR -->
   <script src="backup.js"></script>
 </body>
 </html>
